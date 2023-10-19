@@ -23,7 +23,20 @@ using namespace std;
 
 #define proportion_male             0.5 //proportion of worms that are male
 
+#define n_age_groups                13 //number of age brackets (for seeding pop)
+
+#define sim_years                   26
 //defining prob functions that are used
 double random_real();
 double normal(double mean, double stddev);
 int poisson(double rate);
+
+#define datadir                     "../data/"
+
+#define config                      "../$config/"
+
+#define group_name                  "group_names.csv"
+#define group_locations             "group_locations.csv"
+#define group_populations           "group_populations.csv"
+
+#define age_brackets                "pop_age_dist.csv"
