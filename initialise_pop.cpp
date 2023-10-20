@@ -15,6 +15,11 @@ region::region(int rid, string rname){
     next_gid = 1;
     group_blocks = 0;
 
+    for(int i = 0; i < n_age_groups; i++){
+        age_dist_lower[i] = i*5;
+        age_dist_upper[i] = i*5 + 4;
+    };
+
     //Distances
     euclid_dst = NULL;
     road_dst = NULL;
@@ -30,6 +35,7 @@ region::region(int rid, string rname){
     if (!init){ //first simulation and we havent built population before
         read_groups();
         bld_groups();
+        bld_region_population();
     }
 
 }
@@ -64,11 +70,27 @@ void region::read_groups(){
     }
     in.close();
 
-    //reading in village populations
+    //reading in age distribution
+    file = datadir;    file = file + age_brackets;
+    in.open(file.c_str());
+    
+    while(getline(in, line)){
+        if(line[0] == '*') continue;
+        if(line.length() <= 1) continue;  //empty line with carriage return
+        break;
+    }
+    int ii = 0;
+
+    while(getline(in, line)){
+        age_dist[ii] = atof(line.c_str());
+        ii++;
+    }
+    in.close();
+
     char *str;
     char *p = std::strtok(str, " ,");
 
-
+    //reading in village populations
     file = datadir;    file = file + group_populations;
     in.open(file.c_str());
     
@@ -80,13 +102,13 @@ void region::read_groups(){
         p = std::strtok(str, ",");  //village name may have space
         
         //deal with gender record
-        int mid = group_names[p];
+        int gid = group_names[p];
         
         int pop = 0;
 
         p = std::strtok(NULL, ", ");    pop = atoi(p);
         
-        group_pops.insert(pair<int, int>(mid, pop));
+        group_pops.insert(pair<int, int>(gid, pop));
     
         delete []str;
     }
@@ -137,6 +159,17 @@ void region::bld_groups(){
     }
 };
 
+void region::bld_region_population(){
+
+    //going village by village
+    for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){
+        group *grp = j->second;
+        grp->bld_group_pop();
+    }
+
+};
+
+
 //constructer of groups
 group::group(int gid, region *rgn, double lat, double lon){
     this->gid = gid;
@@ -155,8 +188,31 @@ group::~group(){
     group_pop.clear();
 };
 
+//build individual group populations!
 void group::bld_group_pop(){
-    int pp = rgn->group_pops[gid];
+
+    int group_population = rgn->group_pops[gid];
+    double* age_dist = rgn->age_dist;
     
+    for(int i = 0; i< n_age_groups; i++){
+        if (age_dist[i] == 0) continue;
+
+        int lower_bound = rgn->age_dist_lower[i]; //lower bound of our age bracket
+        int upper_bound = rgn->age_dist_upper[i]; //upper_band of our age bracket
+
+        int pp = group_population*age_dist[i];
+
+        while(pp-- > 0){
+            int id = rgn->next_aid++;
+            int age = 52*(lower_bound + (upper_bound - lower_bound)*random_real()); // age in weeks
+            agent *p = new agent(id,age); //creating new agent of correct age!
+            add_member(p);
+        }
+
+    };
+};
+
+void group::add_member(agent *p){
+    group_pop.insert(pair<int, agent*>(p->aid, p));
 };
 

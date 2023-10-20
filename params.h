@@ -23,10 +23,11 @@ using namespace std;
 
 #define proportion_male             0.5 //proportion of worms that are male
 
-#define n_age_groups                13 //number of age brackets (for seeding pop)
+#define n_age_groups                16 //number of age brackets (for seeding pop)
 
-#define sim_years                   26
-//defining prob functions that are used
+#define sim_years                   26//defining prob functions that are used
+
+#define max_init_age                80*52 //maximum age of agent upon init
 double random_real();
 double normal(double mean, double stddev);
 int poisson(double rate);
@@ -38,5 +39,6 @@ int poisson(double rate);
 #define group_name                  "group_names.csv"
 #define group_locations             "group_locations.csv"
 #define group_populations           "group_populations.csv"
+#define exposure_age                "exposure_age.csv"
 
 #define age_brackets                "pop_age_dist.csv"

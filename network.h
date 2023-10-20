@@ -38,11 +38,17 @@ public:
     int rpop;                          //region population
     int next_aid;                      //agent ID tracker for births
     bool init;                         // Has the population been built before?
+    
     double age_dist[n_age_groups];     //container for the age distribution
+
+    int age_dist_lower[n_age_groups];
+    int age_dist_upper[n_age_groups];
     //used to keep track of total population for easy analysis
     map<int, agent*> pre_indiv;        //collection of latent individuals
     map<int, agent*> inf_indiv;        //collection ofinfectious individuals
     map<int, agent*> uninf_indiv;      //collection of peple with adult worms but are uninfectious individuals (single gender or sterile)
+
+    vector<agent*> pvec[n_age_groups]; //storing all people of certain age group
 
     //now all the information about the groups
     int next_gid, group_blocks;
@@ -74,5 +80,6 @@ public:
     bool pop_reload();
     void read_groups();                                 //read input data
     void bld_groups();                                  //build the model groups 
+    void bld_region_population();//build the population of the region
 };
 #endif /* network_hpp */
