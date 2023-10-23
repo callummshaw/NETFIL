@@ -63,11 +63,14 @@ public:
 
     map<int, int> group_pops;           //pop in each group
  
-    double mmortlty[18];                //mortatlity rates
+    double mortality_rate[n_age_groups];                //mortatlity rates
+    double birth_rate[n_age_groups];
+    double exposure_by_age[16];
 
     region(int rid, string rname);
 
     //Functions that run on region
+    void sim(int year, mda_strat strategy);              //wrapper to run simulation
     void rmv_agent(agent *p);                           //remove dead people from population
     void radt_model(char m);                            //radiation model for daily trips (work/school)
     void hndl_migrt(int week);                          //long term migration between regions
@@ -76,10 +79,16 @@ public:
     void update_epi_status(int week);                   //update agent's epi status
     void seed_clustered_epidemics();                    //seed LF in population
     void implement_MDA(int week, mda_strat strat);      //MDA!
+    
     double achieved_coverage[sim_years];                //MDA coverage!
     bool pop_reload();
     void read_groups();                                 //read input data
     void bld_groups();                                  //build the model groups 
     void bld_region_population();//build the population of the region
+    void read_parameters();
+
+    void reset_population();
+    void reset_prevalence();
+
 };
 #endif /* network_hpp */

@@ -20,7 +20,7 @@ int main(){
 
     double drummystore[16]; 
     //reading in age distribution
-    file = "data/";    file = file + "pop_age_dist.csv";
+    file = "data/";    file = file + "birth_rates.csv";
     in.open(file.c_str());
     
     //skip the description
@@ -36,6 +36,13 @@ int main(){
         ii++;
     }
     cout<<"HERE"<<endl;
-    for (int i = 0; i < 16; i++) cout << drummystore[i] <<endl;
-return 0;
+    for (int i = 0; i < 16; i++){
+        if(drummystore[i] == 0){
+            cout << "No Births!" << endl;
+        }
+        else{
+        cout << drummystore[i] <<endl;
+        }
+    }
+    return 0;
 }

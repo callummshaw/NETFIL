@@ -11,7 +11,6 @@
 
 using namespace std;
 
-
 #define work_bite_rate              0.2 //proportion of bites in working hours
 #define offwork_bite_rate           0.8 //proportion of bites in the rest of the day
 
@@ -33,12 +32,20 @@ double normal(double mean, double stddev);
 int poisson(double rate);
 
 #define datadir                     "../data/"
-
+#define outdir                      "../output/"
 #define config                      "../$config/"
+#define config_pop                  "../$config/pop/"
 
 #define group_name                  "group_names.csv"
 #define group_locations             "group_locations.csv"
 #define group_populations           "group_populations.csv"
 #define exposure_age                "exposure_age.csv"
 
+#define birth_file                  "birth_rates.csv"
+#define mortality_file              "mortality_rates.csv"
 #define age_brackets                "pop_age_dist.csv"
+
+#define crow_distance               "euc_dist.csv"
+#define car_distance                "road_dist.csv"
+
+#define MDA_params                  "MDAParams.csv"

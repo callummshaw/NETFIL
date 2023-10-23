@@ -3,7 +3,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <random>
-
+#include "main.h"
+#include "mda.h"
 
 using namespace std;
 
@@ -12,3 +13,41 @@ unsigned seed;
 random_device r;
 seed_seq seeds{r(), r(), r(), r(), r(), r(), r(), r()};
 mt19937 gen(seeds);
+
+int SimulationNumber;
+unsigned seed;
+
+int main(){
+
+    region *rgn = new region(region_id, region_name);
+
+    string mda_data = datadir; mda_data = mda_data + MDA_params;
+
+    //Counting the number of different simulations we will perform
+    int MDAScenario_count = count_mda_scenarios(mda_data);
+    cout << "There are " << MDAScenario_count << " scenarios" << endl;
+
+    //now looping over scenarios
+    for (int scenario_count = 0; scenario_count < MDAScenario_count; ++scenario_count){
+
+        //generating mda strategy!
+        mda_strat strategy = get_mda_strat(mda_data, scenario_count + 1);
+
+        //Now looping over simulations
+        for (int i = 0; i < strategy.NumSims; ++i){
+            
+            //resetting the populations from previous simulation
+            rgn->reset_population();
+            rgn->reset_prevalence();
+
+            //run run the simulation year by year
+            for(int year = 0; year < sim_years; ++year){
+                cout << "Year: " << year << endl;
+                rgn->sim(year, strategy);
+            }
+        }
+    }
+
+    return 0;
+    
+}
