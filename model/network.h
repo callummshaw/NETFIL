@@ -17,8 +17,19 @@ public:
     region *rgn;                       //region!
     double sum_mf;                      //NEED TO DEFINE
 
-    map<int, agent*> group_pop;       //group population
- 
+    map<int, agent*> group_pop;       //group population (out of work hours)
+
+    //communiting data
+    struct c_node{ //used to store distances to all other groups from current group
+        int gid; //other group idea
+        double dis; //the distance!
+        c_node(int gid, double dis): gid(gid), dis(dis) {}
+    };
+
+    vector<c_node*> commuting_dist; //storing the distances
+    map<int, double> commuting_pop; //the number of commuters from each location
+   
+    map<int, agent*> day_population;    //the commuters to current group! and agents from group that did not commute!
 
     void add_member(agent *p);
     void rmv_member(agent *p);
@@ -67,20 +78,26 @@ public:
     double birth_rate[n_age_groups];
     double exposure_by_age[16];
 
+    double achieved_coverage[sim_years]; // the actual drug coverage achieved each year (for each year of the simulation). Will be zero for most years.
+    int number_treated[sim_years];
+
+
     region(int rid, string rname);
 
     //Functions that run on region
     void sim(int year, mda_strat strategy);              //wrapper to run simulation
+    void handl_commute(int year);                        // generate commuter network
+    void assign_commute();                               //assign agents to their commute!
     void rmv_agent(agent *p);                           //remove dead people from population
     void radt_model(char m);                            //radiation model for daily trips (work/school)
     void hndl_migrt(int week);                          //long term migration between regions
     void hndl_birth(int week);                          // handle new births
     void calc_risk(int week, mda_strat strat);          //find prevalence in each village
     void update_epi_status(int week);                   //update agent's epi status
-    void seed_clustered_epidemics();                    //seed LF in population
-    void implement_MDA(int week, mda_strat strat);      //MDA!
+    void seed_lf();                    //seed LF in population
     
-    double achieved_coverage[sim_years];                //MDA coverage!
+    void implement_MDA(int year, mda_strat strat);      //MDA!
+    
     bool pop_reload();
     void read_groups();                                 //read input data
     void bld_groups();                                  //build the model groups 

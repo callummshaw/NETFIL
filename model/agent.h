@@ -44,8 +44,8 @@ public:
 
     vector<worm*> wvec;
     group *g_p;
-
-    agent(int aid, int age = -1,  group *g_p = NULL);
+    group *d_g;
+    agent(int aid, int age = -1);
 
     ~agent();
 

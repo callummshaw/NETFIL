@@ -27,6 +27,17 @@ using namespace std;
 #define sim_years                   26//defining prob functions that are used
 
 #define max_init_age                80*52 //maximum age of agent upon init
+
+#define init_prev_min               2.75 //minimum initial antigen prev
+#define init_prev_max                3.75 //maximum initial antigen prev
+
+#define sigma_g                     1.31//Household standard dev
+#define beta_0                      -3.9515//beta_0
+
+#define start_year                  2010 //model starting year
+
+#define commuting_prop              0.5 //proportion of group that commut daily (over 5 years old)
+
 double random_real();
 double normal(double mean, double stddev);
 int poisson(double rate);

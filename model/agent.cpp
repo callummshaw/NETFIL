@@ -1,15 +1,14 @@
 #include "agent.h"
 #include "mda.h"
-#include "units.h"
+#include "network.h"
 #include <limits>
 
 //Constructer of agent
-agent::agent(int aid, int age = -1, group *g_p){
+agent::agent(int aid, int age = -1){
     this->aid = aid;
     this->age = age;
     
-    this->g_p = g_p;
-
+   
     status = 's';
 
     worm_strength = 0;

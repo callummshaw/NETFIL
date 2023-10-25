@@ -491,7 +491,7 @@ void group::bld_group_pop(){
 
         while(pp-- > 0){
             int id = rgn->next_aid++;
-            int age = 52*(lower_bound + (upper_bound - lower_bound)*random_real()); // age in weeks
+            int age = 365*(lower_bound + (upper_bound - lower_bound)*random_real()); // age in weeks
             agent *p = new agent(id,age); //creating new agent of correct age!
             add_member(p);
         }
