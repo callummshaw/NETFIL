@@ -37,7 +37,7 @@ using namespace std;
 #define start_year                  2010 //model starting year
 
 #define commuting_prop              0.5 //proportion of group that commut daily (over 5 years old)
-
+#define DailyProbLoseAntigen        0.992327946   //set so the half-life is 90 days i.e. pow(0.5,1/90)
 double random_real();
 double normal(double mean, double stddev);
 int poisson(double rate);

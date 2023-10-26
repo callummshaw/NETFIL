@@ -17,6 +17,16 @@ void region::sim(int year, mda_strat strat){
         implement_MDA(year,strat);
     }
 
+    output_epidemics(year, strat); 
+
+    for(int day = 0; day < 365; ++day){
+        if(!(inf_indiv.empty() & pre_indiv.empty() & uninf_indiv.empty())) { //If disease has not been eliminated
+            calc_risk(year, day, strat); //Determine who gets infected with new worms today - doesn't update epi status
+            update_epi_status(year, day); //update everyone's LF epi status (including the status of each of their worms)
+        }
+        renew_pop(year, day); //TODO update demographic aspects of population
+        hndl_birth(year, day); //TODO Handle births
+    }
 }
 
 void region::seed_lf(){
@@ -36,13 +46,13 @@ void region::seed_lf(){
         for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
 
             agent *cur = k->second;
-
+            cur->ngp = grp; //assigning night group
             double r = random_real();
 
             if(r <= group_prev){ //agent is antigen positive!
             ++ant_pos;
             
-            //NEED TO WRITE                
+            //TODO worm seeding              
             }
         }
     }

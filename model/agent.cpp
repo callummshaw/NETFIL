@@ -13,12 +13,11 @@ agent::agent(int aid, int age = -1){
 
     worm_strength = 0;
 
-    lastwormweek = - std::numeric_limits<double>::infinity();
+    lastwormtime = - std::numeric_limits<double>::infinity();
 }
 
 agent::~agent(){
 
-    g_p = NULL;
 
     for(int i = 0; i < wvec.size(); ++i){
         delete wvec[i];
@@ -68,7 +67,7 @@ void agent::mda(drugs drug){
 }
 
 //update people!
-void agent::update(int week){
+void agent::update(int day){
 
     //Firstly update status of all worms in the body
     if(wvec.size() > 0){ //Now will update each worm
@@ -132,7 +131,7 @@ void agent::update(int week){
 
     //Record if worm has died!
     if((prevstatus == 'U' || prevstatus == 'I') && (status == 'S' || status == 'E')){ // all mature worms have died!
-        lastwormweek = week;
+        lastwormtime = day;
     }
     
 }

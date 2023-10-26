@@ -11,8 +11,9 @@ class region;                          //region which is comprised of the groups
 class group{
 public:
     int gid;                           //Group ID
-    int MDA = 0;                       //Time since MDA
-    int days_before_MDA = 0;           //Time till MDA
+    
+    double day_strength;            //strength of infection during the day
+    double night_strength;           //strength of infection during the day
     double lat, lon;                    //latitude & longitude
     region *rgn;                       //region!
     double sum_mf;                      //NEED TO DEFINE
@@ -85,18 +86,19 @@ public:
     region(int rid, string rname);
 
     //Functions that run on region
-    void sim(int year, mda_strat strategy);              //wrapper to run simulation
-    void handl_commute(int year);                        // generate commuter network
-    void assign_commute();                               //assign agents to their commute!
-    void rmv_agent(agent *p);                           //remove dead people from population
-    void radt_model(char m);                            //radiation model for daily trips (work/school)
-    void hndl_migrt(int week);                          //long term migration between regions
-    void hndl_birth(int week);                          // handle new births
-    void calc_risk(int week, mda_strat strat);          //find prevalence in each village
-    void update_epi_status(int week);                   //update agent's epi status
-    void seed_lf();                    //seed LF in population
-    
-    void implement_MDA(int year, mda_strat strat);      //MDA!
+    void sim(int year, mda_strat strategy);                     //wrapper to run simulation
+    void handl_commute(int year);                               // generate commuter network and assign
+    void rmv_agent(agent *p);                                   //remove dead people from population
+    void radt_model(char m);                                    //radiation model for daily trips (work/school)
+    //void hndl_migrt(int week);                                //TODO long term migration between groups 
+    void hndl_birth(int year, int day);                         // handle new births
+    void calc_risk(int year, int day, mda_strat strat);         //find prevalence in each village
+    void update_epi_status(int year, int day);                  //update agent's epi status
+    void seed_lf();                                             //seed LF in population
+
+    double mf_functional_form(char form, double worm_strength);            //converts worm strength to mf load
+
+    void implement_MDA(int year, mda_strat strat);           //MDA!
     
     bool pop_reload();
     void read_groups();                                 //read input data
@@ -106,6 +108,8 @@ public:
 
     void reset_population();
     void reset_prevalence();
+
+    void output_epidemics(int year, mda_strat strategy);    //output outbreak data
 
 };
 #endif /* network_hpp */

@@ -39,12 +39,14 @@ public:
    
     char status; // epi status
     
-    double lastwormweek; // time since last adult worm
+    double lastwormtime; // time since last adult worm
     double worm_strength;//keep track of number and sterility of mature female worms when there is an adult male!
 
+    group *dgp; //daytime group
+    group *ngp; //nightime group
+    
     vector<worm*> wvec;
-    group *g_p;
-    group *d_g;
+   
     agent(int aid, int age = -1);
 
     ~agent();

@@ -17,8 +17,10 @@ mt19937 gen(seeds);
 int SimulationNumber;
 unsigned seed;
 
-int main(){
+string prv_out_loc;
 
+int main(int argc, const char * argv[]){
+    prv_out_loc = argv[1];
     region *rgn = new region(region_id, region_name);
 
     string mda_data = datadir; mda_data = mda_data + MDA_params;
