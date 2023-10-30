@@ -1,3 +1,6 @@
+#ifndef headers_h
+#define headers_h
+
 #include <algorithm>
 #include <iostream>
 #include <fstream>
@@ -26,7 +29,7 @@ using namespace std;
 
 #define sim_years                   26//defining prob functions that are used
 
-#define max_init_age                80*52 //maximum age of agent upon init
+#define max_init_age                80 //maximum age of agent upon init
 
 #define init_prev_min               2.75 //minimum initial antigen prev
 #define init_prev_max                3.75 //maximum initial antigen prev
@@ -36,8 +39,13 @@ using namespace std;
 
 #define start_year                  2010 //model starting year
 
+#define female_prop                 0.5 //proportion of population that are female
+
 #define commuting_prop              0.5 //proportion of group that commut daily (over 5 years old)
 #define DailyProbLoseAntigen        0.992327946   //set so the half-life is 90 days i.e. pow(0.5,1/90)
+
+#define theta                       1
+
 double random_real();
 double normal(double mean, double stddev);
 int poisson(double rate);
@@ -60,3 +68,4 @@ int poisson(double rate);
 #define car_distance                "road_dist.csv"
 
 #define MDA_params                  "MDAParams.csv"
+#endif /* headers_h */

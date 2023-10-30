@@ -1,10 +1,17 @@
+#ifndef agent_hpp
+#define agent_hpp
+
 #include "params.h"
+#include "mda.h"
+
 
 #include<iostream>
 
 using namespace std;
 
 //Classes that we need
+class group;
+
 class agent; //people in the model
 class worm; //worms!
 
@@ -42,6 +49,8 @@ public:
     double lastwormtime; // time since last adult worm
     double worm_strength;//keep track of number and sterility of mature female worms when there is an adult male!
 
+    bool ChangedEpiToday;
+
     group *dgp; //daytime group
     group *ngp; //nightime group
     
@@ -51,8 +60,10 @@ public:
 
     ~agent();
 
-    void sim_bites(double prev, char time, double c, double theta);
-    void update(int week);
+    void sim_bites(double prev, char time, double c);
+    void update(int day, int year);
     void mda(drugs drug);
 
 };
+
+#endif /* agent_hpp */

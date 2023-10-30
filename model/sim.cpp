@@ -24,8 +24,8 @@ void region::sim(int year, mda_strat strat){
             calc_risk(year, day, strat); //Determine who gets infected with new worms today - doesn't update epi status
             update_epi_status(year, day); //update everyone's LF epi status (including the status of each of their worms)
         }
-        renew_pop(year, day); //TODO update demographic aspects of population
-        hndl_birth(year, day); //TODO Handle births
+        renew_pop(year, day); //deaths
+        hndl_birth(year, day); //births
     }
 }
 

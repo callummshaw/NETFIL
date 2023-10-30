@@ -8,8 +8,8 @@ agent::agent(int aid, int age = -1){
     this->aid = aid;
     this->age = age;
     
-   
-    status = 's';
+    ChangedEpiToday = false;
+    status = 'S';
 
     worm_strength = 0;
 
@@ -26,7 +26,7 @@ agent::~agent(){
 
 }
 
-void agent::sim_bites(double prev, char time, double c, double theta){
+void agent::sim_bites(double prev, char time, double c){
     
     double pos_inf_bite_rate = c*prev*theta;
     
@@ -46,6 +46,8 @@ void agent::sim_bites(double prev, char time, double c, double theta){
             wvec.push_back(new worm('I', immature_period, mature_period, 'F'));
         }
     }
+
+    if(InfectiveBites > 0 && status == 'S') status = 'E';
 }
 
 void agent::mda(drugs drug){
@@ -67,7 +69,7 @@ void agent::mda(drugs drug){
 }
 
 //update people!
-void agent::update(int day){
+void agent::update(int day, int year){
 
     //Firstly update status of all worms in the body
     if(wvec.size() > 0){ //Now will update each worm
@@ -131,7 +133,7 @@ void agent::update(int day){
 
     //Record if worm has died!
     if((prevstatus == 'U' || prevstatus == 'I') && (status == 'S' || status == 'E')){ // all mature worms have died!
-        lastwormtime = day;
+        lastwormtime = year * 365 + day;
     }
     
 }

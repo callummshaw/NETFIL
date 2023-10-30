@@ -1,8 +1,10 @@
 #ifndef network_hpp
 #define network_hpp
 #include <string>
-#include "agent.h"
+
 #include "mda.h"
+#include "agent.h"
+
 using namespace std;
 
 class group;                           //groups of people akin to villages
@@ -88,9 +90,10 @@ public:
     //Functions that run on region
     void sim(int year, mda_strat strategy);                     //wrapper to run simulation
     void handl_commute(int year);                               // generate commuter network and assign
-    void rmv_agent(agent *p);                                   //remove dead people from population
+    void remove_agent(agent *p);                                   //remove dead people from population
     void radt_model(char m);                                    //radiation model for daily trips (work/school)
-    //void hndl_migrt(int week);                                //TODO long term migration between groups 
+    //void hndl_migrt(int week);                                //TODO long term migration between groups (to help avoid groups that have died out)
+    void renew_pop(int year, int day);
     void hndl_birth(int year, int day);                         // handle new births
     void calc_risk(int year, int day, mda_strat strat);         //find prevalence in each village
     void update_epi_status(int year, int day);                  //update agent's epi status
@@ -107,7 +110,6 @@ public:
     void read_parameters();
 
     void reset_population();
-    void reset_prevalence();
 
     void output_epidemics(int year, mda_strat strategy);    //output outbreak data
 

@@ -15,7 +15,6 @@ seed_seq seeds{r(), r(), r(), r(), r(), r(), r(), r()};
 mt19937 gen(seeds);
 
 int SimulationNumber;
-unsigned seed;
 
 string prv_out_loc;
 
@@ -40,7 +39,6 @@ int main(int argc, const char * argv[]){
             
             //resetting the populations from previous simulation
             rgn->reset_population();
-            rgn->reset_prevalence();
 
             //run run the simulation year by year
             for(int year = 0; year < sim_years; ++year){
