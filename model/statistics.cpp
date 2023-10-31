@@ -225,7 +225,6 @@ void region::output_epidemics(int year, mda_strat strategy){
     out << strategy.drug.PartSterProb << ",";
     out << strategy.drug.SterDur << ",";
     out << strategy.drug.PartSterMagnitude << ",";
-    out << strategy.min_age << ",";
     out << strategy.StartYear << ",";
     out << strategy.NumRounds << ",";
     out << strategy.YearsBetweenRounds << ",";

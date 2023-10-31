@@ -50,37 +50,46 @@ void region::handl_commute(int year){
     char distance_type = 'r'; // r for road distance, e for euclidean 
 
     //firstly need to clear previous storage
-
+   
     if (year % recalc_years == 0){    
         radt_model(distance_type); //generating commuting network
-
         for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //now using the network
             group *grp = j->second;
             int no_commute_id = grp->gid;
-
+           
             //now iterating over all group members
             for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
                 agent *cur = k->second; //our agent
-                
+                double cum_sum_floor = 0;
                 if(random_real() > commuting_prop){ //Will not commute!
                     grp->day_population.insert(pair<int, agent*>(cur->aid, cur)); //storing them in current group for day population
+                    cur->dgp = groups[no_commute_id];
                 } 
                 else{ //person will commute
                     int commute_id;
+                    double commute_dest = random_real();
                     //but commute where?
-                for(map<int, double>::iterator i = grp->commuting_pop.begin(); i != grp->commuting_pop.end(); ++i){
-                        if(i->second < 1) continue;//every has commuted that we need to this village so we will skip it
-                        else{ //person will go here
+                    for(map<int, double>::iterator i = grp->commuting_cumsum.begin(); i != grp->commuting_pop.end(); ++i){
+                        
+                        if ((cum_sum_floor < commute_dest) && (commute_dest <= i->second)){
                             commute_id = i->first;
                             cur->dgp = groups[commute_id]; //assigning agent to day group
-                            i->second -= 1; //remove member
-                            break;
-                        }
+                            groups[commute_id]->day_population.insert(pair<int, agent*>(cur->aid, cur)); //storing them in commuting group for day population
+                            goto found_commute;
+                        } 
+                        else {
+                            cum_sum_floor = i->second;
+                        }   
                     }
-                    groups[commute_id]->day_population.insert(pair<int, agent*>(cur->aid, cur)); //storing them in commuting group for day population
                 }
+                found_commute:;
             }
         }
+    }
+    rpop = 0;
+    for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){
+        group *grp = j->second;   
+        rpop += grp->group_pop.size();
     }
 }
 
@@ -246,18 +255,21 @@ void region::renew_pop(int year, int day){
 void region::remove_agent(agent *p){
 
     //removing agent from lists of infected
+   
     if(p->status == 'E') pre_indiv.erase(p->aid);
     else if(p->status == 'I') inf_indiv.erase(p->aid);
     else if(p->status == 'U') uninf_indiv.erase(p->aid);
-
+    
     //daytime group
     group *dgrp = p->dgp;
     //nightime group
     group *ngrp = p->ngp;
 
-    dgrp->day_population.erase(p->aid);
     ngrp->group_pop.erase(p->aid);
-
+    dgrp->day_population.erase(p->aid);
+    
+   
+    
     delete p;
 }
 
@@ -280,7 +292,8 @@ void region::hndl_birth(int year, int day){ //deal with births
         //now assigning births
         while (total_births > 0) {
             agent *bb = new agent(next_aid++, 0); //have birth!
-            
+            bb->ngp = grp;
+            bb->dgp = grp;
             grp->add_member(bb); //assigning baby to group
             grp->day_population.insert(pair<int, agent*>(bb->aid, bb));//assume baby stays within group during day
             

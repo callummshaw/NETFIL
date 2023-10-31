@@ -31,14 +31,14 @@ region::region(int rid, string rname){
 
     //recreate population when there multiple simulations
     init = pop_reload();
-     cout <<"1"<<endl;
+    
     if (!init){ //first simulation and we havent built population before
         read_groups();
-        cout <<"1"<<endl;
+       
         bld_groups();
-        cout <<"1"<<endl;
+       
         bld_region_population();
-cout <<"1"<<endl;
+
         //now saving all our config files (to use on other runs!)
 
         //Saving group meta data
@@ -150,7 +150,7 @@ void region::read_groups(){
 
     ifstream in;
     string line, file;
-    cout <<"1"<<endl;
+   
     //firstly reading in group names! 
     file = datadir; file = file + group_name;
     in.open(file.c_str());
@@ -165,10 +165,9 @@ void region::read_groups(){
         }
     }
     in.close();
-    cout <<"1"<<endl;
+    
     group_blocks = (int)group_names.size();
 
-    cout <<"2"<<endl;
     //reading in age distribution
     file = datadir;    file = file + age_brackets;
     in.open(file.c_str());
@@ -189,7 +188,6 @@ void region::read_groups(){
     char *str;
     char *p = NULL;
 
-    cout <<"3"<<endl;
     //reading in village populations
     file = datadir;    file = file + group_populations;
     in.open(file.c_str());
@@ -214,7 +212,6 @@ void region::read_groups(){
     }
     in.close();
 
-    cout <<"4"<<endl;
     //now reading in village locations
     file = datadir;     file = file + group_locations;
     in.open(file.c_str());
@@ -243,7 +240,7 @@ void region::read_groups(){
         cout << "Group coordinates are missing" << endl;
         exit(1);
     }
-    cout <<"5"<<endl;
+    
     //calculate cpop
     for(map<int, int>::iterator j = group_pops.begin(); j != group_pops.end(); ++j){
         int gid = j->first;
@@ -458,6 +455,10 @@ void region::reset_population(){
     next_gid = 1;
     group_blocks = 0;
 
+    if(!pop_reload()){
+        cout << "reload pop err" << endl;
+        exit(1);
+    }
     read_parameters();
 
 }

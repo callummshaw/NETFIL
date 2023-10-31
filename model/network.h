@@ -30,8 +30,8 @@ public:
     };
 
     vector<c_node*> commuting_dist; //storing the distances
-    map<int, double> commuting_pop; //the number of commuters from each location
-   
+    map<int, double> commuting_pop; //the prop of commuters from each location
+    map<int,double> commuting_cumsum; //cumsum of commuters from each location
     map<int, agent*> day_population;    //the commuters to current group! and agents from group that did not commute!
 
     void add_member(agent *p);

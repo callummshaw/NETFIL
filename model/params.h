@@ -31,7 +31,7 @@ using namespace std;
 
 #define max_init_age                80 //maximum age of agent upon init
 
-#define init_prev_min               2.75 //minimum initial antigen prev
+#define init_prev_min               0//2.75 //minimum initial antigen prev
 #define init_prev_max                3.75 //maximum initial antigen prev
 
 #define sigma_g                     1.31//Household standard dev

@@ -12,7 +12,7 @@ void region::radt_model(char m){
     struct _comp_cnode_s{ //comparing distances for sorting
         bool operator() (const group::c_node *p, const group::c_node *q){ return (p->dis < q->dis);}
     } _smaller;
-
+    
     //iterating over groups
     for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){
         group *src = j->second;
@@ -21,6 +21,7 @@ void region::radt_model(char m){
         src->commuting_dist.clear();
         src->commuting_pop.clear();
         src->day_population.clear();
+        src->commuting_cumsum.clear();
 
         if(src->commuting_dist.size() == 0){ 
             int src_id = src->gid;
@@ -39,9 +40,12 @@ void region::radt_model(char m){
         }
 
         double mi = src->group_pop.size(); //population of current group
-        double Ti = mi*commuting_prop; //how many people will be commuting 
-
+        //double Ti = mi*commuting_prop; //how many people will be commuting 
+           
         //now looping over all other locations
+        double total_move = 0;
+        double cum_sum_ceiling = 0.0;
+
         for(int k = 0; k < src->commuting_dist.size(); ++k){
             group *dst = groups[src->commuting_dist[k]->gid];  //other group
             double nj = dst ->group_pop.size(); //other group population
@@ -49,9 +53,18 @@ void region::radt_model(char m){
             for(int i = 0; i < k; ++i){ //iterating over other groups that have a smaller distance
                 sij += groups[src->commuting_dist[k]->gid]->group_pop.size();
             }
-    
-            double Tij  = Ti*mi*nj/(mi+nj)/(mi+nj+sij);// relative people from I to J 
+            double Tij  = mi*nj/(mi+nj)/(mi+nj+sij);// relative people from I to J 
+            total_move += Tij;
             src->commuting_pop[src->commuting_dist[k]->gid] = Tij; //storing all commuters from i that go to j 
+           
+
         }
+    
+        for(map<int, double>::iterator ii = src->commuting_pop.begin(); ii != src->commuting_pop.end(); ++ii){
+            int gid = ii->first;
+            cum_sum_ceiling += ii->second/total_move; 
+            src->commuting_cumsum[gid] = cum_sum_ceiling;
+        }
+        
     }
 }
