@@ -4,7 +4,7 @@
 #include <limits>
 
 //Constructer of agent
-agent::agent(int aid, int age = -1){
+agent::agent(int aid, int age){
     this->aid = aid;
     this->age = age;
     

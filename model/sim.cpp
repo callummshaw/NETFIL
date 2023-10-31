@@ -18,7 +18,7 @@ void region::sim(int year, mda_strat strat){
     }
 
     output_epidemics(year, strat); 
-
+   
     for(int day = 0; day < 365; ++day){
         if(!(inf_indiv.empty() & pre_indiv.empty() & uninf_indiv.empty())) { //If disease has not been eliminated
             calc_risk(year, day, strat); //Determine who gets infected with new worms today - doesn't update epi status

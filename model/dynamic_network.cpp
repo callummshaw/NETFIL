@@ -147,9 +147,11 @@ void region::calc_risk(int year, int day, mda_strat strat){
 double region::mf_functional_form(char form, double worm_strength){
     if(form == 'l'){ // limitation
         //TODO write limitation function 
+        return worm_strength;
     }
     else if(form == 'f'){ //facilitation
         //TODO write facilitation function 
+        return worm_strength;
     }
     else{ //asumme linear
         return worm_strength;

@@ -1,8 +1,7 @@
 #include <iostream>
 #include <ctime>
 #include <unistd.h>
-#include <stdlib.h>
-#include <random>
+
 #include "main.h"
 #include "mda.h"
 
@@ -20,8 +19,9 @@ string prv_out_loc;
 
 int main(int argc, const char * argv[]){
     prv_out_loc = argv[1];
+   
     region *rgn = new region(region_id, region_name);
-
+ cout <<"Here"<<endl;
     string mda_data = datadir; mda_data = mda_data + MDA_params;
 
     //Counting the number of different simulations we will perform
@@ -39,7 +39,7 @@ int main(int argc, const char * argv[]){
             
             //resetting the populations from previous simulation
             rgn->reset_population();
-
+            cout << rgn->groups.size() << endl;
             //run run the simulation year by year
             for(int year = 0; year < sim_years; ++year){
                 cout << "Year: " << year << endl;

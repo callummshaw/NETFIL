@@ -2,8 +2,6 @@
 #define agent_hpp
 
 #include "params.h"
-#include "mda.h"
-
 
 #include<iostream>
 
@@ -11,6 +9,8 @@ using namespace std;
 
 //Classes that we need
 class group;
+class drugs;
+class mda_strat;
 
 class agent; //people in the model
 class worm; //worms!

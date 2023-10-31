@@ -1,7 +1,6 @@
 #ifndef mda_h
-#define mda_h
 #include "params.h"
-
+#define mda_h
 #include <vector>
 #include <algorithm>
 
