@@ -18,7 +18,6 @@ agent::agent(int aid, int age){
 
 agent::~agent(){
 
-
     for(int i = 0; i < wvec.size(); ++i){
         delete wvec[i];
     }
@@ -39,11 +38,11 @@ void agent::sim_bites(double prev, char time, double c){
         int immature_period = normal(immature_period_mean, immature_period_mean_std); //immature period of worm
         int mature_period = normal(mature_period_mean, mature_period_mean_std); //mature period of worm
 
-        if (random_real() < proportion_male){ // worm is male!
-            wvec.push_back(new worm('I', immature_period, mature_period, 'M'));
+        if (random_real() < proportion_male_worm){ // worm is male!
+            wvec.push_back(new worm('P', immature_period, mature_period, 'M'));
         }
         else{ // worm is female!
-            wvec.push_back(new worm('I', immature_period, mature_period, 'F'));
+            wvec.push_back(new worm('P', immature_period, mature_period, 'F'));
         }
     }
 
@@ -69,15 +68,14 @@ void agent::mda(drugs drug){
 }
 
 //update people!
-void agent::update(int day, int year){
-
+void agent::update(int day, int year, int dt){
     //Firstly update status of all worms in the body
     if(wvec.size() > 0){ //Now will update each worm
         for(int i = 0; i < wvec.size();){ 
-            wvec[i]->update();
+            wvec[i]->update(dt);
             
             //Removing dead worms!
-            if(wvec[i]->status == 'd'){ 
+            if(wvec[i]->status == 'D'){ 
                 delete wvec[i];
                 wvec.erase(wvec.begin() + i);
             }
@@ -94,19 +92,21 @@ void agent::update(int day, int year){
 
     //update agent's epi status
     if(wvec.size() == 0){ //no Worms!
-        status = 'S'; // therfore in S class!
+        status = 'S'; // therefore in S class!
         worm_strength = 0.0; //agent has no worm strength
     } 
+
     else{ //person has worms!
         for(int i =0; i < wvec.size(); ++i){ //iterating over worms
             if(wvec[i]->status == 'M'){ // if worm is mature
                 mature_worm = true;
+
                 if (wvec[i]->sex == 'M'){//male worm
                     if (wvec[i]->mda_sterile > 0){
                         worm_strength_male += wvec[i]->mda_sterile;
                     }
                 }
-                else{ // female worm
+                else if (wvec[i]->sex == 'F'){// female worm
                     if (wvec[i]->mda_sterile > 0){
                         worm_strength_female += wvec[i]->mda_sterile;
                     }
@@ -116,7 +116,7 @@ void agent::update(int day, int year){
         }
         if((worm_strength_female > 0) && (worm_strength_male > 0)){ //agent is infectious!
             status = 'I';// person is infectious
-
+            
             if(worm_strength_male > 1.0) worm_strength_male = 1.0; //We assume polygamous worms that relies on females
 
             worm_strength = worm_strength_male * worm_strength_female; // total worm strength
@@ -139,19 +139,21 @@ void agent::update(int day, int year){
 }
 
 //update worms!
-void worm::update(){
-    //Three statuses: I-immature, M-mature, D-Dead 
+void worm::update(int dt){
+    //Three statuses: P-immature, M-mature, D-Dead 
 
-    if(status == 'I'){
-        if(age_immature == 0) status = 'M'; //worm is now mature!
-        else --age_immature; // countdown
+    if(status == 'P'){
+        if(age_immature <= 0){ 
+            status = 'M';
+            } //worm is now mature!
+        else age_immature -= dt; // countdown
     }
 
     if(status == 'M'){
-        if(age_mature == 0) status = 'D'; //worm is dead!
-        else --age_mature;
+        if(age_mature <= 0) status = 'D'; //worm is dead!
+        else age_mature -= dt;
     }
 
-    if (age_mda > 0) --age_mda; //now looking at sterilisation status of worm!
+    if (age_mda > 0) age_mda -= dt; //now looking at sterilisation status of worm!
     else mda_sterile = 1.0; //sterile period now over!
 }

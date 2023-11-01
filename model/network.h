@@ -58,7 +58,7 @@ public:
     int age_dist_lower[n_age_groups];
     int age_dist_upper[n_age_groups];
     //used to keep track of total population for easy analysis
-    map<int, agent*> pre_indiv;        //collection of latent individuals
+    map<int, agent*> pre_indiv;        //collection of immautre worms individuals
     map<int, agent*> inf_indiv;        //collection ofinfectious individuals
     map<int, agent*> uninf_indiv;      //collection of peple with adult worms but are uninfectious individuals (single gender or sterile)
 
@@ -92,11 +92,11 @@ public:
     void handl_commute(int year);                               // generate commuter network and assign
     void remove_agent(agent *p);                                   //remove dead people from population
     void radt_model(char m);                                    //radiation model for daily trips (work/school)
-    //void hndl_migrt(int week);                                //TODO long term migration between groups (to help avoid groups that have died out)
-    void renew_pop(int year, int day);
+    //void hndl_migrt(int day);                                //TODO long term migration between groups (to help avoid groups that have died out)
+    void renew_pop(int year, int day, int dt);
     void hndl_birth(int year, int day);                         // handle new births
-    void calc_risk(int year, int day, mda_strat strat);         //find prevalence in each village
-    void update_epi_status(int year, int day);                  //update agent's epi status
+    void calc_risk(int year, int day, int dt, mda_strat strat);         //find prevalence in each village
+    void update_epi_status(int year, int day, int dt);                  //update agent's epi status
     void seed_lf();                                             //seed LF in population
 
     double mf_functional_form(char form, double worm_strength);            //converts worm strength to mf load
@@ -110,7 +110,7 @@ public:
     void read_parameters();
 
     void reset_population();
-
+    void reset_prev();
     void output_epidemics(int year, mda_strat strategy);    //output outbreak data
 
 };

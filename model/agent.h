@@ -35,7 +35,7 @@ public:
         mda_sterile = 1.0;
     }
 
-    void update();
+    void update(int dt);
 };
 
 class agent{
@@ -61,7 +61,7 @@ public:
     ~agent();
 
     void sim_bites(double prev, char time, double c);
-    void update(int day, int year);
+    void update(int day, int year, int dt);
     void mda(drugs drug);
 
 };

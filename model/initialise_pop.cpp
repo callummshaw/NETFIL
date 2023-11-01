@@ -463,6 +463,41 @@ void region::reset_population(){
 
 }
 
+void region::reset_prev(){
+    //now need to clera worms from people
+    for(map<int, agent*>::iterator j = inf_indiv.begin(); j != inf_indiv.end(); ++j){
+        agent *cur =j->second;
+        cur->status = 'S';
+        cur->worm_strength = 0;
+        for(int i = 0; i < cur->wvec.size(); ++i){
+            delete cur->wvec[i];
+        }
+        cur->wvec.clear();
+    }
+
+    for(map<int, agent*>::iterator j = pre_indiv.begin(); j != pre_indiv.end(); ++j){
+        agent *cur =j->second;
+        cur->status = 'S';
+        for(int i = 0; i < cur->wvec.size(); ++i){
+            delete cur->wvec[i];
+        }
+        cur->wvec.clear();
+    }
+
+    for(map<int, agent*>::iterator j = uninf_indiv.begin(); j != uninf_indiv.end(); ++j){
+        agent *cur =j->second;
+        cur->status = 'S';
+        for(int i = 0; i < cur->wvec.size(); ++i){
+            delete cur->wvec[i];
+        }
+        cur->wvec.clear();
+    }
+
+    //resetting population
+    pre_indiv.clear();
+    inf_indiv.clear();
+    uninf_indiv.clear();
+}
 //constructer of groups
 group::group(int gid, region *rgn, double lat, double lon){
     this->gid = gid;
@@ -497,7 +532,7 @@ void group::bld_group_pop(){
 
         while(pp-- > 0){
             int id = rgn->next_aid++;
-            int age = 365*(lower_bound + (upper_bound - lower_bound)*random_real()); // age in weeks
+            int age = 365*(lower_bound + (upper_bound - lower_bound)*random_real()); // age 
             agent *p = new agent(id,age); //creating new agent of correct age!
             add_member(p);
         }

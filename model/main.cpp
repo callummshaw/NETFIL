@@ -17,8 +17,8 @@ int SimulationNumber;
 
 string prv_out_loc;
 
-int main(int argc, const char * argv[]){
-    prv_out_loc = argv[1];
+int main(){//main(int argc, const char * argv[]){
+    prv_out_loc = "test_debug.csv";// argv[1];
    
     region *rgn = new region(region_id, region_name);
  
@@ -42,8 +42,9 @@ int main(int argc, const char * argv[]){
            
             //run run the simulation year by year
             for(int year = 0; year < sim_years; ++year){
-                cout << "Year: " << year << endl;
+             
                 rgn->sim(year, strategy);
+              
             }
         }
     }
