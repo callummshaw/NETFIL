@@ -28,7 +28,7 @@ using namespace std;
 
 #define n_age_groups                16 //number of age brackets (for seeding pop)
 
-#define sim_years                   26//defining prob functions that are used
+#define sim_years                   20//defining prob functions that are used
 
 #define max_init_age                80 //maximum age of agent upon init
 
@@ -44,8 +44,6 @@ using namespace std;
 
 #define commuting_prop              0.5 //proportion of group that commut daily (over 5 years old)
 #define DailyProbLoseAntigen        0.992327946   //set so the half-life is 90 days i.e. pow(0.5,1/90)
-
-#define theta                       0.003
 
 double random_real();
 double normal(double mean, double stddev);
@@ -69,4 +67,5 @@ int poisson(double rate);
 #define car_distance                "road_dist.csv"
 
 #define MDA_params                  "MDAParams.csv"
+#define Tran_param                  "TranParams.csv"
 #endif /* headers_h */

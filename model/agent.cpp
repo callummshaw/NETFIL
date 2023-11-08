@@ -27,7 +27,7 @@ agent::~agent(){
 
 void agent::sim_bites(double prev, char time, double c){
     
-    double pos_inf_bite_rate = c*prev*theta;
+    double pos_inf_bite_rate = c*prev;
     
     if (time == 'D') pos_inf_bite_rate *= work_bite_rate; //bites during working hours
     else pos_inf_bite_rate *= offwork_bite_rate;  //bites outside working hours

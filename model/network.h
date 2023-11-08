@@ -53,6 +53,11 @@ public:
     int next_aid;                      //agent ID tracker for births
     bool init;                         // Has the population been built before?
     
+    double theta1 = 0;                      //transmission parameters
+    double theta2 = 0;
+    double theta3 = 0;
+
+    double agg_param = 1000;
     double age_dist[n_age_groups];     //container for the age distribution
 
     int age_dist_lower[n_age_groups];
@@ -84,7 +89,6 @@ public:
     double achieved_coverage[sim_years]; // the actual drug coverage achieved each year (for each year of the simulation). Will be zero for most years.
     int number_treated[sim_years];
 
-
     region(int rid, string rname);
 
     //Functions that run on region
@@ -94,7 +98,7 @@ public:
     void radt_model(char m);                                    //radiation model for daily trips (work/school)
     //void hndl_migrt(int day);                                //TODO long term migration between groups (to help avoid groups that have died out)
     void renew_pop(int year, int day, int dt);
-    void hndl_birth(int year, int day);                         // handle new births
+    void hndl_birth(int year, int day, int dt);                         // handle new births
     void calc_risk(int year, int day, int dt, mda_strat strat);         //find prevalence in each village
     void update_epi_status(int year, int day, int dt);                  //update agent's epi status
     void seed_lf();                                             //seed LF in population
@@ -113,5 +117,8 @@ public:
     void reset_prev();
     void output_epidemics(int year, mda_strat strategy);    //output outbreak data
 
+    int factorial(int n);
+    vector<double> prob_worms(double prev, int n_worms);
+    int number_worms(vector<double> cum_sum_prob, double prob);
 };
 #endif /* network_hpp */

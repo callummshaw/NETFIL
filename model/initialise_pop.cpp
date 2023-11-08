@@ -233,6 +233,7 @@ void region::read_groups(){
         double *r = new double[2];
         r[0] = lat;     r[1] = log;
         group_coords.insert(pair<int, double*>(mid, r));
+         delete []str;
     }
     in.close();
     
@@ -424,7 +425,24 @@ void region::read_parameters(){
     }
     in.close();
     
-
+    file = datadir; file = file + Tran_param;
+    in.open(file.c_str());
+    getline(in, line);
+    getline(in,line);
+    char *str = new char[line.size()+1];
+    strcpy(str, line.c_str());
+    char *p = NULL;
+  
+    p = strtok(str, ",");      double theta_1 = atof(p);
+    p = strtok(NULL, ",");     double theta_2 = atof(p);
+    p = strtok(NULL, ",");     double k = atof(p);
+    
+    delete []str;
+    in.close();
+     
+    theta1 = theta_1;
+    theta2 = theta_2;
+    agg_param = k;
 
 }
 

@@ -156,15 +156,15 @@ void region::calc_risk(int year, int day, int dt, mda_strat strat){
 
 double region::mf_functional_form(char form, double worm_strength){
     if(form == 'l'){ // limitation
-        //TODO write limitation function 
-        return worm_strength;
+       
+        return theta1*worm_strength / (1 + theta2*worm_strength);
     }
     else if(form == 'f'){ //facilitation
-        //TODO write facilitation function 
-        return worm_strength;
+        
+        return theta1*(worm_strength - theta2*worm_strength / (1 + theta3*worm_strength));
     }
     else{ //asumme linear
-        return worm_strength;
+        return theta1*worm_strength;
     }
 }
 
@@ -243,7 +243,7 @@ void region::renew_pop(int year, int day, int dt){
             int index = int(int(cur->age/365)/5);
             if(index > 15) index = 15; //all 75+ the same
 
-            double prob = 1 - exp(-mortality_rate[index]);
+            double prob = 1 - exp(-mortality_rate[index]*dt);
             if(random_real() < prob) deaths.push_back(cur); //seeing if agent dies depending on age
             else cur->age += dt; //increase everyones age
         }
@@ -277,21 +277,22 @@ void region::remove_agent(agent *p){
     delete p;
 }
 
-void region::hndl_birth(int year, int day){ //deal with births
+void region::hndl_birth(int year, int day, int dt){ //deal with births
     
     int total_births  = 0;
 
     for(map<int,group*>::iterator j = groups.begin(); j != groups.end(); j++){//looping over groups
         group *grp = j->second;
         for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){//over agents
-            if(random_real() > proportion_male_agent){ // excluding male population
-                agent *cur = k->second;
-                if(cur->age >= 18*365 && cur->age < 60*365){
-                    int index = int((int(cur->age/365)-15)/5);
-                    double prob = 1 - exp(-birth_rate[index]);
-                    if(random_real() < prob) ++total_births; 
-                }
+           
+            agent *cur = k->second;
+            if(cur->age >= 20*365 && cur->age < 50*365){
+                int index = int((int(cur->age/365))/5);
+                double prob = 1 - exp(-birth_rate[index]*dt);
+                
+                if(random_real() < prob) ++total_births; 
             }
+            
         }
         //now assigning births
         while (total_births > 0) {

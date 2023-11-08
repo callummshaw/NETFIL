@@ -17,8 +17,8 @@ int SimulationNumber;
 
 string prv_out_loc;
 
-int main(){//main(int argc, const char * argv[]){
-    prv_out_loc = "test_debug.csv";// argv[1];
+int main(int argc, const char * argv[]){
+    prv_out_loc = argv[1];
    
     region *rgn = new region(region_id, region_name);
  
