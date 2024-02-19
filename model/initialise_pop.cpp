@@ -425,7 +425,13 @@ void region::read_parameters(){
     }
     in.close();
     
-    file = datadir; file = file + Tran_param;
+    if (ABC_fitting == true){
+        file = Tran_param;
+    }
+    else{
+        file = datadir; file = file + Tran_param;
+    }
+    
     in.open(file.c_str());
     getline(in, line);
     getline(in,line);
