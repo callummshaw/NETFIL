@@ -60,7 +60,7 @@ public:
 
     ~agent();
 
-    void sim_bites(double prev, char time, double c);
+    void sim_bites(double prev, char time, double c, double biteload, double w2n);
     void update(int day, int year, int dt);
     void mda(drugs drug);
 

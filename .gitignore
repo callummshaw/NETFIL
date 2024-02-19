@@ -1,0 +1,3 @@
+*.init
+output/*
+data/.ipynb_checkpoints/*

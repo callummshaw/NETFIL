@@ -25,24 +25,36 @@ agent::~agent(){
 
 }
 
-void agent::sim_bites(double prev, char time, double c){
+void agent::sim_bites(double prev, char time, double c, double twotoone, double worktonot){
     
     double pos_inf_bite_rate = c*prev;
     
-    if (time == 'D') pos_inf_bite_rate *= work_bite_rate; //bites during working hours
-    else pos_inf_bite_rate *= offwork_bite_rate;  //bites outside working hours
+    if (time == 'D') pos_inf_bite_rate *= worktonot; //bites during working hours
+    else pos_inf_bite_rate *= (1.0-worktonot);  //bites outside working hours
 
     int InfectiveBites = poisson(pos_inf_bite_rate); // the number of bites agent will recieve
-
+    
     for(int i = 0; i < InfectiveBites; ++i){ //looping through bites
         int immature_period = normal(immature_period_mean, immature_period_mean_std); //immature period of worm
         int mature_period = normal(mature_period_mean, mature_period_mean_std); //mature period of worm
 
-        if (random_real() < proportion_male_worm){ // worm is male!
+        if (random_real() > twotoone ){
+            if (random_real() < proportion_male_worm){ // worm is male!
             wvec.push_back(new worm('P', immature_period, mature_period, 'M'));
+            }
+            else{ // worm is female!
+                wvec.push_back(new worm('P', immature_period, mature_period, 'F'));
+            }
         }
-        else{ // worm is female!
-            wvec.push_back(new worm('P', immature_period, mature_period, 'F'));
+        else{
+            for (int i = 0; i < 2; i++) {
+                if (random_real() < proportion_male_worm){ // worm is male!
+                wvec.push_back(new worm('P', immature_period, mature_period, 'M'));
+                }
+                else{ // worm is female!
+                    wvec.push_back(new worm('P', immature_period, mature_period, 'F'));
+                }
+            }
         }
     }
 
@@ -68,7 +80,7 @@ void agent::mda(drugs drug){
 }
 
 //update people!
-void agent::update(int day, int year, int dt){
+void agent::update(int year, int day, int dt){
     //Firstly update status of all worms in the body
     if(wvec.size() > 0){ //Now will update each worm
         for(int i = 0; i < wvec.size();){ 
@@ -133,7 +145,7 @@ void agent::update(int day, int year, int dt){
 
     //Record if worm has died!
     if((prevstatus == 'U' || prevstatus == 'I') && (status == 'S' || status == 'E')){ // all mature worms have died!
-        lastwormtime = year * 365 + day;
+        lastwormtime = year * 365 + day*dt;
     }
     
 }

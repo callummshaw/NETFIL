@@ -51,12 +51,23 @@ public:
     double init_prev = 0;              // initial prevalence
     int rpop;                          //region population
     int next_aid;                      //agent ID tracker for births
-    bool init;                         // Has the population been built before?
-    
+    bool init;                         // Has the population been built before?    
     double theta1 = 0;                      //transmission parameters
     double theta2 = 0;
     double theta3 = 0;
 
+    double immature_to_antigen = 0;
+    double immature_and_unif = 0;
+
+    double twotoone = 0;
+    double worktonot = 0;
+    int data_ant_u = 0;
+    int data_ant_o = 0;
+    int data_mf = 0;
+
+
+    double mf_to_ant_2014;
+    
     double agg_param = 1000;
     double age_dist[n_age_groups];     //container for the age distribution
 
@@ -75,6 +86,13 @@ public:
     map<string, int> group_names;       //each group assigned name to index
     map<int, string> group_numbers;     //each group assigned number to index
     map<int, double*> group_coords;     //coords of each group
+
+    // For fitting
+    double mf_2014 = 0;
+    double ant_2014 = 0;
+
+    double mf_2016 = 0;
+    double ant_2016 = 0;
 
     //distances 
     double *euclid_dst;                 //euclidean (L2) distance between groups
@@ -99,7 +117,7 @@ public:
     //void hndl_migrt(int day);                                //TODO long term migration between groups (to help avoid groups that have died out)
     void renew_pop(int year, int day, int dt);
     void hndl_birth(int year, int day, int dt);                         // handle new births
-    void calc_risk(int year, int day, int dt, mda_strat strat);         //find prevalence in each village
+    void calc_risk();         //find prevalence in each village
     void update_epi_status(int year, int day, int dt);                  //update agent's epi status
     void seed_lf();                                             //seed LF in population
 
@@ -116,7 +134,7 @@ public:
     void reset_population();
     void reset_prev();
     void output_epidemics(int year, mda_strat strategy);    //output outbreak data
-
+    void output_abc_epidemics(int year);
     int factorial(int n);
     vector<double> prob_worms(double prev, int n_worms);
     int number_worms(vector<double> cum_sum_prob, double prob);

@@ -436,6 +436,11 @@ void region::read_parameters(){
     p = strtok(str, ",");      double theta_1 = atof(p);
     p = strtok(NULL, ",");     double theta_2 = atof(p);
     p = strtok(NULL, ",");     double k = atof(p);
+    p = strtok(NULL, ",");     double imtoant = atof(p);
+    p = strtok(NULL, ",");     double inandun = atof(p);
+    p = strtok(NULL, ",");     double biteload = atof(p);
+    p = strtok(NULL, ",");     double w2n = atof(p);
+
     
     delete []str;
     in.close();
@@ -443,7 +448,10 @@ void region::read_parameters(){
     theta1 = theta_1;
     theta2 = theta_2;
     agg_param = k;
-
+    immature_to_antigen = imtoant;
+    immature_and_unif = inandun;
+    twotoone = biteload;
+    worktonot  = w2n;
 }
 
 void region::reset_population(){

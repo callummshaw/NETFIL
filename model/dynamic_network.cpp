@@ -94,7 +94,7 @@ void region::handl_commute(int year){
     }
 }
 
-void region::calc_risk(int year, int day, int dt, mda_strat strat){
+void region::calc_risk(){
     
     char form = 'l'; //l for limitation, f for facilation, or anything else for linear 
 
@@ -104,6 +104,7 @@ void region::calc_risk(int year, int day, int dt, mda_strat strat){
         grp->night_strength = 0;
     }
     
+    //Finding strength of infection in each group
     //now looping over all infected agents
     for(map<int, agent*>::iterator j = inf_indiv.begin(); j != inf_indiv.end(); ++j){
         
@@ -120,6 +121,7 @@ void region::calc_risk(int year, int day, int dt, mda_strat strat){
         ngrp->night_strength += c*mf_functional_form(form, j->second->worm_strength) / (double) ngrp->day_population.size();
     }
 
+    //Now finding infective bites
     for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //looping over groups
         group *grp = j->second;
         for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){ //night infections
@@ -129,7 +131,7 @@ void region::calc_risk(int year, int day, int dt, mda_strat strat){
             int age = int(cur->age / 365);
             if (age <= 15) c = exposure_by_age[age];
             
-            cur->sim_bites(grp->night_strength,'N', c); // simulating the bites!
+            cur->sim_bites(grp->night_strength,'N', c, twotoone, worktonot); // simulating the bites!
 
             if(cur->status == 'E' && prev_status == 'S'){
                 pre_indiv.insert(pair<int, agent *>(cur->aid, cur));
@@ -144,7 +146,7 @@ void region::calc_risk(int year, int day, int dt, mda_strat strat){
             int age = int(cur->age / 365);
             if (age <= 15) c = exposure_by_age[age];
             
-            cur->sim_bites(grp->day_strength,'D', c); // simulating the bites!
+            cur->sim_bites(grp->day_strength,'D', c, twotoone, worktonot); // simulating the bites!
 
             if(cur->status == 'E' && prev_status == 'S'){
                 pre_indiv.insert(pair<int, agent *>(cur->aid, cur));
@@ -248,7 +250,6 @@ void region::renew_pop(int year, int day, int dt){
             else cur->age += dt; //increase everyones age
         }
     }
-
     while(deaths.size() > 0){ //now removing agents that have died
         agent *cur = deaths.back();
         remove_agent(cur);
@@ -286,7 +287,7 @@ void region::hndl_birth(int year, int day, int dt){ //deal with births
         for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){//over agents
            
             agent *cur = k->second;
-            if(cur->age >= 20*365 && cur->age < 50*365){
+            if(cur->age >= 15*365 && cur->age < 50*365){
                 int index = int((int(cur->age/365))/5);
                 double prob = 1 - exp(-birth_rate[index]*dt);
                 

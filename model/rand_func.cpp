@@ -1,8 +1,7 @@
 #include "params.h"
-#include <random>
+#include "rng.h"
 
 using namespace std;
-extern mt19937 gen;
 
 double random_real(){
     uniform_real_distribution<> distribution(0.0,1.0);

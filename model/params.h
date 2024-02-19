@@ -14,9 +14,6 @@
 
 using namespace std;
 
-#define work_bite_rate              0.2 //proportion of bites in working hours
-#define offwork_bite_rate           0.8 //proportion of bites in the rest of the day
-
 #define immature_period_mean        30*3 //mean immature period  
 #define immature_period_mean_std    30*0.1 //STD dev of immature period 
 
@@ -28,31 +25,44 @@ using namespace std;
 
 #define n_age_groups                16 //number of age brackets (for seeding pop)
 
-#define sim_years                   20//defining prob functions that are used
+#define sim_years                   7//defining prob functions that are used
 
 #define max_init_age                80 //maximum age of agent upon init
 
 #define init_prev_min               2.75 //minimum initial antigen prev
 #define init_prev_max               3.75 //maximum initial antigen prev
 
-#define sigma_g                     1.31//Household standard dev
+#define sigma_g                     1.1311//Household standard dev
 #define beta_0                      -3.9515//beta_0
-
-#define matedtonot                  0.144 //ratio of mated worms to unmated in antigen postive pop in 2010
+       
+#define matedtonot                  0.1683 //ratio of mated worms to unmated in antigen postive pop in 2010
 
 #define start_year                  2010 //model starting year
 
 #define commuting_prop              0.5 //proportion of group that commut daily (over 5 years old)
 #define DailyProbLoseAntigen        0.992327946   //set so the half-life is 90 days i.e. pow(0.5,1/90)
 
+
+#define ABC_fitting                 false
+
 double random_real();
 double normal(double mean, double stddev);
 int poisson(double rate);
+
+/*
+#define datadir                     "LF2/data/"
+#define outdir                      ""
+#define config                      "LF2/$config/"
+#define config_pop                  "LF2/$config/pop/"
+#define Tran_param                  "TranParams-temp"
+*/
 
 #define datadir                     "../data/"
 #define outdir                      "../output/"
 #define config                      "../$config/"
 #define config_pop                  "../$config/pop/"
+#define Tran_param                  "TranParams.csv"
+
 
 #define group_name                  "group_names.csv"
 #define group_locations             "group_locations.csv"
@@ -67,5 +77,4 @@ int poisson(double rate);
 #define car_distance                "road_dist.csv"
 
 #define MDA_params                  "MDAParams.csv"
-#define Tran_param                  "TranParams.csv"
 #endif /* headers_h */
