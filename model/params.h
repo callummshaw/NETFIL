@@ -48,7 +48,7 @@ using namespace std;
 double random_real();
 double normal(double mean, double stddev);
 int poisson(double rate);
-
+double bite_gamma(double shape, double scale);
 /*
 #define datadir                     "LF2/data/"
 #define outdir                      ""

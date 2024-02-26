@@ -4,16 +4,19 @@
 #include <limits>
 
 //Constructer of agent
-agent::agent(int aid, int age){
+agent::agent(int aid,  double bite_shape, int age){
     this->aid = aid;
     this->age = age;
-    
+   
     ChangedEpiToday = false;
     status = 'S';
 
     worm_strength = 0;
 
     lastwormtime = - std::numeric_limits<double>::infinity();
+
+    day_bite_scale = bite_gamma(bite_shape, 1/bite_shape);
+    night_bite_scale = bite_gamma(bite_shape, 1/bite_shape);
 }
 
 agent::~agent(){
@@ -25,40 +28,30 @@ agent::~agent(){
 
 }
 
-void agent::sim_bites(double prev, char time, double c, double twotoone, double worktonot){
+void agent::sim_bites(double c, double worktonot){
     
-    double pos_inf_bite_rate = c*prev;
-    
-    if (time == 'D') pos_inf_bite_rate *= worktonot; //bites during working hours
-    else pos_inf_bite_rate *= (1.0-worktonot);  //bites outside working hours
+    int day_bites;
+    int night_bites;
+    int total_bites;
 
-    int InfectiveBites = poisson(pos_inf_bite_rate); // the number of bites agent will recieve
+    day_bites  = poisson(c *  dgp->day_strength * day_bite_scale * worktonot);
+    night_bites = poisson(c * ngp->night_strength * night_bite_scale * (1.0 - worktonot));
+
+    total_bites = day_bites + night_bites;
     
-    for(int i = 0; i < InfectiveBites; ++i){ //looping through bites
+    for(int i = 0; i < total_bites; ++i){ //looping through infective bites and assigning worms
         int immature_period = normal(immature_period_mean, immature_period_mean_std); //immature period of worm
         int mature_period = normal(mature_period_mean, mature_period_mean_std); //mature period of worm
 
-        if (random_real() > twotoone ){
-            if (random_real() < proportion_male_worm){ // worm is male!
+        if (random_real() < proportion_male_worm){ // worm is male!
             wvec.push_back(new worm('P', immature_period, mature_period, 'M'));
-            }
-            else{ // worm is female!
-                wvec.push_back(new worm('P', immature_period, mature_period, 'F'));
-            }
         }
-        else{
-            for (int i = 0; i < 2; i++) {
-                if (random_real() < proportion_male_worm){ // worm is male!
-                wvec.push_back(new worm('P', immature_period, mature_period, 'M'));
-                }
-                else{ // worm is female!
-                    wvec.push_back(new worm('P', immature_period, mature_period, 'F'));
-                }
-            }
+        else{ // worm is female!
+            wvec.push_back(new worm('P', immature_period, mature_period, 'F'));
         }
     }
 
-    if(InfectiveBites > 0 && status == 'S') status = 'E';
+    if(total_bites > 0 && status == 'S') status = 'E';
 }
 
 void agent::mda(drugs drug){

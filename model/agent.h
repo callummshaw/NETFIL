@@ -43,8 +43,12 @@ public:
     
     int aid; // agent's id
     int age; // agent's age
-   
-    char status; // epi status
+    
+
+    double day_bite_scale;
+    double night_bite_scale;
+
+    char status; // epi status S = no worms, E = immature only, U = mature but only single sex (ant postive), I =  multiple mature worms (mf postive) 
     
     double lastwormtime; // time since last adult worm
     double worm_strength;//keep track of number and sterility of mature female worms when there is an adult male!
@@ -56,11 +60,11 @@ public:
     
     vector<worm*> wvec;
    
-    agent(int aid, int age = -1);
+    agent(int aid, double bite_shape, int age = -1);
 
     ~agent();
 
-    void sim_bites(double prev, char time, double c, double biteload, double w2n);
+    void sim_bites(double c, double w2n);
     void update(int day, int year, int dt);
     void mda(drugs drug);
 

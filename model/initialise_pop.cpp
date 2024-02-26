@@ -133,7 +133,7 @@ bool region::pop_reload(){
             char *p = std::strtok(str, ",");        int id = atoi(p);
             p = std::strtok(NULL, ",");             int age = atoi(p);
             
-            agent *pp = new agent(id, age);
+            agent *pp = new agent(id, agg_param, age);
 
             j->second->add_member(pp);
             
@@ -444,10 +444,8 @@ void region::read_parameters(){
     p = strtok(NULL, ",");     double k = atof(p);
     p = strtok(NULL, ",");     double imtoant = atof(p);
     p = strtok(NULL, ",");     double inandun = atof(p);
-    p = strtok(NULL, ",");     double biteload = atof(p);
     p = strtok(NULL, ",");     double w2n = atof(p);
 
-    
     delete []str;
     in.close();
      
@@ -455,8 +453,7 @@ void region::read_parameters(){
     theta2 = theta_2;
     agg_param = k;
     immature_to_antigen = imtoant;
-    immature_and_unif = inandun;
-    twotoone = biteload;
+    immature_and_ant = inandun;
     worktonot  = w2n;
 }
 
@@ -565,7 +562,7 @@ void group::bld_group_pop(){
         while(pp-- > 0){
             int id = rgn->next_aid++;
             int age = 365*(lower_bound + (upper_bound - lower_bound)*random_real()); // age 
-            agent *p = new agent(id,age); //creating new agent of correct age!
+            agent *p = new agent(id,rgn->agg_param,age); //creating new agent of correct age!
             add_member(p);
         }
 

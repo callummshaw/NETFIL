@@ -12,10 +12,12 @@ class region;                          //region which is comprised of the groups
 
 class group{
 public:
+
     int gid;                           //Group ID
     
     double day_strength;            //strength of infection during the day
     double night_strength;           //strength of infection during the day
+    
     double lat, lon;                    //latitude & longitude
     region *rgn;                       //region!
     double sum_mf;                      //NEED TO DEFINE
@@ -52,21 +54,17 @@ public:
     int rpop;                          //region population
     int next_aid;                      //agent ID tracker for births
     bool init;                         // Has the population been built before?    
-    double theta1 = 0;                      //transmission parameters
+    
+    double theta1 = 0;                      //transmission parameters for the different mf maturation scalings!
     double theta2 = 0;
     double theta3 = 0;
 
-    double immature_to_antigen = 0;
-    double immature_and_unif = 0;
+    double immature_to_antigen = 0;     //at init the ratio of people with just immature worms to antigen positive people (fitted) 
+    double immature_and_ant = 0;       //at init the ratio of people with people who are ant pos but mf negative with immature worms
 
-    double twotoone = 0;
-    double worktonot = 0;
-    int data_ant_u = 0;
-    int data_ant_o = 0;
-    int data_mf = 0;
+    double worktonot = 0;               //where to a majaortiy of bites occur?
 
-
-    double mf_to_ant_2014;
+    double mf_to_ant_2014; //used to save fitting data
     
     double agg_param = 1000;
     double age_dist[n_age_groups];     //container for the age distribution
@@ -136,7 +134,7 @@ public:
     void output_epidemics(int year, mda_strat strategy);    //output outbreak data
     void output_abc_epidemics(int year);
     int factorial(int n);
-    vector<double> prob_worms(double prev, int n_worms);
+    vector<double> prob_worms(double prev);
     int number_worms(vector<double> cum_sum_prob, double prob);
 };
 #endif /* network_hpp */

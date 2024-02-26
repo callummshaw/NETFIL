@@ -20,3 +20,9 @@ double normal(double mean, double stddev){
 
     return distribution(gen);
 }
+
+double bite_gamma(double shape, double scale){
+    gamma_distribution<double> distribution(shape, scale);
+
+    return distribution(gen);
+}

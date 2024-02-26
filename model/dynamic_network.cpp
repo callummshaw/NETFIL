@@ -47,7 +47,7 @@ void region::implement_MDA(int year, mda_strat strat){
 
 void region::handl_commute(int year){
     
-    int recalc_years = 2; //how often we want to recalc commuters
+    int recalc_years = 5; //how often we want to recalc commuters
     char distance_type = 'r'; // r for road distance, e for euclidean 
 
     //firstly need to clear previous storage
@@ -61,6 +61,14 @@ void region::handl_commute(int year){
             //now iterating over all group members
             for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
                 agent *cur = k->second; //our agent
+                
+                
+                //will update agents biting risk as well if not first year!
+                if(year != 0){
+                    cur->day_bite_scale = bite_gamma(agg_param, 1/agg_param);
+                    cur->night_bite_scale = bite_gamma(agg_param, 1/agg_param);
+                }
+                
                 double cum_sum_floor = 0;
                 if(random_real() > commuting_prop){ //Will not commute!
                     grp->day_population.insert(pair<int, agent*>(cur->aid, cur)); //storing them in current group for day population
@@ -86,6 +94,9 @@ void region::handl_commute(int year){
                 found_commute:;
             }
         }
+
+        //we will also update all agents biting probs 
+
     }
     rpop = 0;
     for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){
@@ -113,45 +124,33 @@ void region::calc_risk(){
         group *ngrp = cur->ngp; //infected agents nightime group
 
         int age = int(cur->age / 365);
-        double c = 1;
+        double c = 1.0;
 
         if(age <= 15) c = exposure_by_age[age];
              
         dgrp->day_strength += c*mf_functional_form(form, j->second->worm_strength) / (double) dgrp->day_population.size();
         ngrp->night_strength += c*mf_functional_form(form, j->second->worm_strength) / (double) ngrp->day_population.size();
     }
-
+    
     //Now finding infective bites
+    
     for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //looping over groups
         group *grp = j->second;
-        for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){ //night infections
+        //looping over all people!
+        
+        for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){ //looping over all people will do both night and day bites in same loop
+        
             agent *cur = k->second; //our person
             char prev_status = cur ->status;
             double c = 1; //
             int age = int(cur->age / 365);
             if (age <= 15) c = exposure_by_age[age];
             
-            cur->sim_bites(grp->night_strength,'N', c, twotoone, worktonot); // simulating the bites!
+            cur->sim_bites(c, worktonot); // simulating the bites!
 
             if(cur->status == 'E' && prev_status == 'S'){
                 pre_indiv.insert(pair<int, agent *>(cur->aid, cur));
             }
-        }
-
-        for(map<int, agent*>::iterator k = grp->day_population.begin(); k != grp->day_population.end(); ++k){ //day infections
-
-            agent *cur = k->second; //our person
-            char prev_status = cur ->status;
-            double c = 1; //
-            int age = int(cur->age / 365);
-            if (age <= 15) c = exposure_by_age[age];
-            
-            cur->sim_bites(grp->day_strength,'D', c, twotoone, worktonot); // simulating the bites!
-
-            if(cur->status == 'E' && prev_status == 'S'){
-                pre_indiv.insert(pair<int, agent *>(cur->aid, cur));
-            }
-
         }
     }
 }
@@ -297,7 +296,7 @@ void region::hndl_birth(int year, int day, int dt){ //deal with births
         }
         //now assigning births
         while (total_births > 0) {
-            agent *bb = new agent(next_aid++, 0); //have birth!
+            agent *bb = new agent(next_aid++, agg_param, 0); //have birth!
             bb->ngp = grp;
             bb->dgp = grp;
             grp->add_member(bb); //assigning baby to group
