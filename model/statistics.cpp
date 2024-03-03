@@ -292,6 +292,102 @@ void region::output_epidemics(int year, mda_strat strategy){
     out.close();
 }
 
+void region::output_abc_epidemics_init(){
+
+
+    int ant_count = 0;
+    double antprev =0;
+    double mf_ant = 0;
+    
+    for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //going through groups
+        group *grp = j->second;
+        //now over people
+        for(map<int,agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
+            agent *a = k-> second;
+            if(a->status == 'I' || a->status == 'U'){ 
+                ++ant_count; 
+            }
+        }
+
+    }
+
+    mf_ant = (double)inf_indiv.size()/(double)ant_count;
+    antprev = (double)ant_count/(double)rpop;
+
+    string init_out = "summary_stats_temp.txt";
+       
+
+    ofstream out;   ifstream in;
+    out.open(init_out.c_str());
+    out <<  "Antigen ";
+    out <<  "Ratio ";
+    out << endl;
+    out << antprev;
+    out << ' ' << mf_ant;
+    out << endl;
+    out.close();
+    
+}
+
+void region::output_abc_epidemics_single(int year){
+
+    
+    if (year + start_year == 2014) {
+        
+        int ant_count = 0;
+        
+        for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //going through groups
+            group *grp = j->second;
+            //now over people
+            for(map<int,agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
+                agent *a = k-> second;
+                if(a->status == 'I' || a->status == 'U'|| random_real() < pow(DailyProbLoseAntigen, year*365 - a->lastwormtime) ){ 
+                    ++ant_count; 
+                }
+            }
+
+        }
+        mf_to_ant_2014 =  (double)inf_indiv.size()/(double)ant_count;
+    }
+
+    if (year + start_year == 2016) {
+        double mf_2016;
+        double ant_2016;
+
+        int ant_count = 0;
+        
+        for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //going through groups
+            group *grp = j->second;
+            //now over people
+            for(map<int,agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
+                agent *a = k-> second;
+                if(a->status == 'I' || a->status == 'U'|| random_real() < pow(DailyProbLoseAntigen, year*365 - a->lastwormtime) ){ 
+                    ++ant_count; 
+                }
+            }
+
+        }
+
+        mf_2016 =  (double)inf_indiv.size()/(double)rpop*100;
+        ant_2016 = (double)ant_count/(double)rpop*100;
+        
+        string init_out = "summary_stats_temp.txt";
+
+        ofstream out;   ifstream in;
+        out.open(init_out.c_str());
+        out <<  "Ratio_2014 ";
+        out <<  "Antigen_2016 ";
+        out <<  "MF_2016"; 
+        out << endl;
+        out << mf_to_ant_2014;
+        out << ' ' << ant_2016;
+        out << ' ' << mf_2016;
+        out << endl;
+        out.close();
+    }
+}
+
+
 void region::output_abc_epidemics(int year){
 
     int icc_2016 = 0;

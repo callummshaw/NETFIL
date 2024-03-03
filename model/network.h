@@ -50,7 +50,8 @@ class region{
 public:
     int rid;                           //region ID 
     string rname;                      //region name                   
-    double init_prev = 0;              // initial prevalence
+    double init_prev;              // initial prevalence
+    double init_ratio;
     int rpop;                          //region population
     int next_aid;                      //agent ID tracker for births
     bool init;                         // Has the population been built before?    
@@ -116,8 +117,10 @@ public:
     void renew_pop(int year, int day, int dt);
     void hndl_birth(int year, int day, int dt);                         // handle new births
     void calc_risk();         //find prevalence in each village
+    void calc_risk_single();
     void update_epi_status(int year, int day, int dt);                  //update agent's epi status
     void seed_lf();                                             //seed LF in population
+    void seed_lf_single();
 
     double mf_functional_form(char form, double worm_strength);            //converts worm strength to mf load
 
@@ -133,6 +136,8 @@ public:
     void reset_prev();
     void output_epidemics(int year, mda_strat strategy);    //output outbreak data
     void output_abc_epidemics(int year);
+    void output_abc_epidemics_single(int year);
+    void output_abc_epidemics_init();
     int factorial(int n);
     vector<double> prob_worms(double prev);
     int number_worms(vector<double> cum_sum_prob, double prob);

@@ -1,6 +1,6 @@
 #include "rng.h"
-
-unsigned seed = 12345; // Use current time as seed
+#include <chrono>
+unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 std::mt19937 gen(seed); // Seed the generator
 
 // Warm up the generator

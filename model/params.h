@@ -32,37 +32,49 @@ using namespace std;
 #define init_prev_min               2.75 //minimum initial antigen prev
 #define init_prev_max               3.75 //maximum initial antigen prev
 
+#define init_ratio_min              0.15
+#define init_ratio_max              0.18
+
+#define ant_0                       0.0325 //initial antigen prev
 #define sigma_g                     1.1311//Household standard dev
 #define beta_0                      -3.9515//beta_0
        
-#define matedtonot                  0.1683 //ratio of mated worms to unmated in antigen postive pop in 2010
-
 #define start_year                  2010 //model starting year
 
 #define commuting_prop              0.5 //proportion of group that commut daily (over 5 years old)
 #define DailyProbLoseAntigen        0.992327946   //set so the half-life is 90 days i.e. pow(0.5,1/90)
 
+#define init_k                      0.0505
 
-#define ABC_fitting                 false
+#define ABC_fitting                 true
+#define ABC_fitting_init            false
 
 double random_real();
 double normal(double mean, double stddev);
 int poisson(double rate);
 double bite_gamma(double shape, double scale);
-/*
-#define datadir                     "LF2/data/"
-#define outdir                      ""
-#define config                      "LF2/$config/"
-#define config_pop                  "LF2/$config/pop/"
-#define Tran_param                  "TranParams-temp"
-*/
 
+#if ABC_fitting || ABC_fitting_init
+    #define datadir "LF2/data/"
+    #define outdir ""
+    #define config "LF2/$config/"
+    #define config_pop "LF2/$config/pop/"
+    #define Tran_param "TranParams-temp"
+#else
+    #define datadir "../data/"
+    #define outdir "../output/"
+    #define config "../$config/"
+    #define config_pop "../$config/pop/"
+    #define Tran_param "TranParams.csv"
+#endif
+
+/*
 #define datadir                     "../data/"
 #define outdir                      "../output/"
 #define config                      "../$config/"
 #define config_pop                  "../$config/pop/"
 #define Tran_param                  "TranParams.csv"
-
+*/
 
 #define group_name                  "group_names.csv"
 #define group_locations             "group_locations.csv"

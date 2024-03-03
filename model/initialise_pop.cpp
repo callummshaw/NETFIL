@@ -331,130 +331,154 @@ void region::read_parameters(){
     }
     in.close();
 
-    //reading road_dst & euclid_dst
-    int len = group_blocks*(group_blocks-1)/2;
-    road_dst = new double[len];     memset(road_dst, 0, sizeof(double)*len);
-    euclid_dst = new double[len];   memset(euclid_dst, 0, sizeof(double)*len);
-    
-    file = datadir;     file = file + car_distance;
-    in.open(file.c_str());
-    
-    getline(in, line);
-    vector<string> grp_vec;
-    {
-        char *str = new char[line.size()+1];
-        std::strcpy(str, line.c_str());
+    //reading road_dst & euclid_dst for multigroup sims!
+    if (group_blocks > 1){
+        int len = group_blocks*(group_blocks-1)/2;
+        road_dst = new double[len];     memset(road_dst, 0, sizeof(double)*len);
+        euclid_dst = new double[len];   memset(euclid_dst, 0, sizeof(double)*len);
         
-        char *p = std::strtok(str, ",");
-        while(p != NULL){
-            grp_vec.push_back(p);
-            p = std::strtok(NULL, ",");
-        }
-        delete []str;
+        file = datadir;     file = file + car_distance;
+        in.open(file.c_str());
         
-        while(getline(in, line)){
-            str = new char[line.size()+1];
+        getline(in, line);
+        vector<string> grp_vec;
+        {
+            char *str = new char[line.size()+1];
             std::strcpy(str, line.c_str());
             
-            p = std::strtok(str, ",");
-            string src = p;
-            int src_id = group_names[src];
-            
-            int index = 0;
-            p = std::strtok(NULL, ",");
+            char *p = std::strtok(str, ",");
             while(p != NULL){
-                string tag = grp_vec[index++];
-                int tag_id = group_names[tag];
-                
-                if(tag_id > src_id){
-                    double dd = atof(p);
-                    
-                    int ii = (src_id-1)*(group_blocks*2-src_id)/2 + tag_id-src_id - 1;
-                    road_dst[ii] = dd;
-                }
-                
+                grp_vec.push_back(p);
                 p = std::strtok(NULL, ",");
             }
             delete []str;
+            
+            while(getline(in, line)){
+                str = new char[line.size()+1];
+                std::strcpy(str, line.c_str());
+                
+                p = std::strtok(str, ",");
+                string src = p;
+                int src_id = group_names[src];
+                
+                int index = 0;
+                p = std::strtok(NULL, ",");
+                while(p != NULL){
+                    string tag = grp_vec[index++];
+                    int tag_id = group_names[tag];
+                    
+                    if(tag_id > src_id){
+                        double dd = atof(p);
+                        
+                        int ii = (src_id-1)*(group_blocks*2-src_id)/2 + tag_id-src_id - 1;
+                        road_dst[ii] = dd;
+                    }
+                    
+                    p = std::strtok(NULL, ",");
+                }
+                delete []str;
+            }
         }
-    }
-    grp_vec.clear();
-    grp_vec.shrink_to_fit();
-    in.close();
-    
-    file = datadir;     file = file + crow_distance;
-    in.open(file.c_str());
-    
-    getline(in, line);
-    {
-        char *str = new char[line.size()+1];
-        std::strcpy(str, line.c_str());
+        grp_vec.clear();
+        grp_vec.shrink_to_fit();
+        in.close();
         
-        char *p = std::strtok(str, ",");
-        while(p != NULL){
-            grp_vec.push_back(p);
-            p = std::strtok(NULL, ",");
-        }
-        delete []str;
+        file = datadir;     file = file + crow_distance;
+        in.open(file.c_str());
         
-        while(getline(in, line)){
-            str = new char[line.size()+1];
+        getline(in, line);
+        {
+            char *str = new char[line.size()+1];
             std::strcpy(str, line.c_str());
             
-            p = std::strtok(str, ",");
-            string src = p;
-            int src_id = group_names[src];
-            
-            int index = 0;
-            p = std::strtok(NULL, ",");
+            char *p = std::strtok(str, ",");
             while(p != NULL){
-                string tag = grp_vec[index++];
-                int tag_id = group_names[tag];
-                
-                if(tag_id > src_id){
-                    double dd = atof(p);
-                    
-                    int ii = (src_id-1)*(group_blocks*2-src_id)/2 + tag_id-src_id - 1;
-                    euclid_dst[ii] = dd;
-                }
-                
+                grp_vec.push_back(p);
                 p = std::strtok(NULL, ",");
             }
             delete []str;
+            
+            while(getline(in, line)){
+                str = new char[line.size()+1];
+                std::strcpy(str, line.c_str());
+                
+                p = std::strtok(str, ",");
+                string src = p;
+                int src_id = group_names[src];
+                
+                int index = 0;
+                p = std::strtok(NULL, ",");
+                while(p != NULL){
+                    string tag = grp_vec[index++];
+                    int tag_id = group_names[tag];
+                    
+                    if(tag_id > src_id){
+                        double dd = atof(p);
+                        
+                        int ii = (src_id-1)*(group_blocks*2-src_id)/2 + tag_id-src_id - 1;
+                        euclid_dst[ii] = dd;
+                    }
+                    
+                    p = std::strtok(NULL, ",");
+                }
+                delete []str;
+            }
         }
+        in.close();
     }
-    in.close();
     
-    if (ABC_fitting == true){
+    if (ABC_fitting || ABC_fitting_init){
         file = Tran_param;
+        in.open(file.c_str());
+        getline(in, line);
+        getline(in,line);
+        char *str = new char[line.size()+1];
+        strcpy(str, line.c_str());
+        char *p = NULL;
+    
+        p = strtok(str, " ");      double theta_1 = atof(p);
+        p = strtok(NULL, " ");     double theta_2 = atof(p);
+        p = strtok(NULL, " ");     double k = atof(p);
+        p = strtok(NULL, " ");     double imtoant = atof(p);
+        p = strtok(NULL, " ");     double inandun = atof(p);
+        p = strtok(NULL, " ");     double w2n = atof(p);
+
+        delete []str;
+        in.close();
+        
+        theta1 = theta_1;
+        theta2 = theta_2;
+        agg_param = k;
+        immature_to_antigen = imtoant;
+        immature_and_ant = inandun;
+        worktonot  = w2n;
     }
     else{
         file = datadir; file = file + Tran_param;
-    }
+        in.open(file.c_str());
+        getline(in, line);
+        getline(in,line);
+        char *str = new char[line.size()+1];
+        strcpy(str, line.c_str());
+        char *p = NULL;
     
-    in.open(file.c_str());
-    getline(in, line);
-    getline(in,line);
-    char *str = new char[line.size()+1];
-    strcpy(str, line.c_str());
-    char *p = NULL;
-  
-    p = strtok(str, ",");      double theta_1 = atof(p);
-    p = strtok(NULL, ",");     double theta_2 = atof(p);
-    p = strtok(NULL, ",");     double k = atof(p);
-    p = strtok(NULL, ",");     double imtoant = atof(p);
-    p = strtok(NULL, ",");     double inandun = atof(p);
-    p = strtok(NULL, ",");     double w2n = atof(p);
+        p = strtok(str, ",");      double theta_1 = atof(p);
+        p = strtok(NULL, ",");     double theta_2 = atof(p);
+        p = strtok(NULL, ",");     double k = atof(p);
+        p = strtok(NULL, ",");     double imtoant = atof(p);
+        p = strtok(NULL, ",");     double inandun = atof(p);
+        p = strtok(NULL, ",");     double w2n = atof(p);
 
-    delete []str;
-    in.close();
-     
-    theta1 = theta_1;
-    theta2 = theta_2;
-    agg_param = k;
-    immature_to_antigen = imtoant;
-    immature_and_ant = inandun;
-    worktonot  = w2n;
+        delete []str;
+        in.close();
+        
+        theta1 = theta_1;
+        theta2 = theta_2;
+        agg_param = k;
+        immature_to_antigen = imtoant;
+        immature_and_ant = inandun;
+        worktonot  = w2n;
+    }
 }
 
 void region::reset_population(){

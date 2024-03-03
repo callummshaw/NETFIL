@@ -53,48 +53,60 @@ void region::handl_commute(int year){
     //firstly need to clear previous storage
    
     if (year % recalc_years == 0){    
-        radt_model(distance_type); //generating commuting network
-        for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //now using the network
-            group *grp = j->second;
-            int no_commute_id = grp->gid;
-           
-            //now iterating over all group members
-            for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
-                agent *cur = k->second; //our agent
-                
-                
-                //will update agents biting risk as well if not first year!
-                if(year != 0){
-                    cur->day_bite_scale = bite_gamma(agg_param, 1/agg_param);
+        
+        if((groups.size() == 1) & (year != 0)){
+            for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //now using the network
+                group *grp = j->second;
+               
+                for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
+                    agent *cur = k->second; //our agent
                     cur->night_bite_scale = bite_gamma(agg_param, 1/agg_param);
                 }
-                
-                double cum_sum_floor = 0;
-                if(random_real() > commuting_prop){ //Will not commute!
-                    grp->day_population.insert(pair<int, agent*>(cur->aid, cur)); //storing them in current group for day population
-                    cur->dgp = groups[no_commute_id];
-                } 
-                else{ //person will commute
-                    int commute_id;
-                    double commute_dest = random_real();
-                    //but commute where?
-                    for(map<int, double>::iterator i = grp->commuting_cumsum.begin(); i != grp->commuting_pop.end(); ++i){
-                        
-                        if ((cum_sum_floor < commute_dest) && (commute_dest <= i->second)){
-                            commute_id = i->first;
-                            cur->dgp = groups[commute_id]; //assigning agent to day group
-                            groups[commute_id]->day_population.insert(pair<int, agent*>(cur->aid, cur)); //storing them in commuting group for day population
-                            goto found_commute;
-                        } 
-                        else {
-                            cum_sum_floor = i->second;
-                        }   
-                    }
-                }
-                found_commute:;
             }
         }
-
+        else if (groups.size() > 1){
+            radt_model(distance_type); //generating commuting network
+            for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //now using the network
+                group *grp = j->second;
+                int no_commute_id = grp->gid;
+            
+                //now iterating over all group members
+                for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
+                    agent *cur = k->second; //our agent
+                    
+                    
+                    //will update agents biting risk as well if not first year!
+                    if(year != 0){
+                        cur->day_bite_scale = bite_gamma(agg_param, 1/agg_param);
+                        cur->night_bite_scale = bite_gamma(agg_param, 1/agg_param);
+                    }
+                    
+                    double cum_sum_floor = 0;
+                    if(random_real() > commuting_prop){ //Will not commute!
+                        grp->day_population.insert(pair<int, agent*>(cur->aid, cur)); //storing them in current group for day population
+                        cur->dgp = groups[no_commute_id];
+                    } 
+                    else{ //person will commute
+                        int commute_id;
+                        double commute_dest = random_real();
+                        //but commute where?
+                        for(map<int, double>::iterator i = grp->commuting_cumsum.begin(); i != grp->commuting_pop.end(); ++i){
+                            
+                            if ((cum_sum_floor < commute_dest) && (commute_dest <= i->second)){
+                                commute_id = i->first;
+                                cur->dgp = groups[commute_id]; //assigning agent to day group
+                                groups[commute_id]->day_population.insert(pair<int, agent*>(cur->aid, cur)); //storing them in commuting group for day population
+                                goto found_commute;
+                            } 
+                            else {
+                                cum_sum_floor = i->second;
+                            }   
+                        }
+                    }
+                    found_commute:;
+                }
+            }
+        }
         //we will also update all agents biting probs 
 
     }
@@ -148,6 +160,52 @@ void region::calc_risk(){
             
             cur->sim_bites(c, worktonot); // simulating the bites!
 
+            if(cur->status == 'E' && prev_status == 'S'){
+                pre_indiv.insert(pair<int, agent *>(cur->aid, cur));
+            }
+        }
+    }
+}
+
+void region::calc_risk_single(){
+    
+    char form = 'l'; //l for limitation, f for facilation, or anything else for linear 
+
+    for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //setting the force of transmission in each group to 0
+        group *grp = j->second;
+        grp->night_strength = 0;
+    }
+    
+    //Finding strength of infection in each group
+    //now looping over all infected agents
+    for(map<int, agent*>::iterator j = inf_indiv.begin(); j != inf_indiv.end(); ++j){
+        
+        agent *cur =j->second;
+        group *ngrp = cur->ngp; //infected agents nightime group
+
+        int age = int(cur->age / 365);
+        double c = 1.0;
+
+        if(age <= 15) c = exposure_by_age[age];
+             
+        ngrp->night_strength += c*mf_functional_form(form, j->second->worm_strength) / (double) ngrp->day_population.size();
+    }
+                            
+
+    //Now finding infective bites
+    
+    for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //looping over groups
+        group *grp = j->second;
+        //looping over all people!
+        
+        for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){ //looping over all people will do both night and day bites in same loop
+        
+            agent *cur = k->second; //our person
+            char prev_status = cur ->status;
+            double c = 1; //
+            int age = int(cur->age / 365);
+            if (age <= 15) c = exposure_by_age[age];
+            cur->sim_bites_single(c); // simulating the bites!
             if(cur->status == 'E' && prev_status == 'S'){
                 pre_indiv.insert(pair<int, agent *>(cur->aid, cur));
             }
@@ -264,14 +322,16 @@ void region::remove_agent(agent *p){
     else if(p->status == 'I') inf_indiv.erase(p->aid);
     else if(p->status == 'U') uninf_indiv.erase(p->aid);
     
-    //daytime group
-    group *dgrp = p->dgp;
-    //nightime group
-    group *ngrp = p->ngp;
-
-    ngrp->group_pop.erase(p->aid);
-    dgrp->day_population.erase(p->aid);
     
+    //nightime group    
+    group *ngrp = p->ngp;
+    ngrp->group_pop.erase(p->aid);
+    
+    if (groups.size() >1 ){
+        //daytime group
+        group *dgrp = p->dgp;
+        dgrp->day_population.erase(p->aid);
+    }
    
     
     delete p;

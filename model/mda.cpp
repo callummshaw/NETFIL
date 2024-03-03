@@ -66,8 +66,8 @@ mda_strat get_mda_strat(string filename, int N)
     mda_strat strat {MDACoverage,drug, MinAge, MDAStartYear, MDANumRound, MDAYearsBetweenRound,NumSims};
 
     //printing MDA and drug stats
-    drug.print_drugs();
-    strat.print_mda_strat();
+    //drug.print_drugs();
+    //strat.print_mda_strat();
 
     return strat;
 }
