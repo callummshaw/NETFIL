@@ -2,8 +2,12 @@
 #include "network.h"
 #include "mda.h"
 
+extern string prv_out_loc;
+
 void region::sim(int year, mda_strat strat){
     
+    bool debug_fit = false; //prints out yearly data
+
     if (ABC_fitting && ABC_fitting_init){
         cout << "Warning both stages of fitting turned on" << endl;
     }
@@ -26,9 +30,11 @@ void region::sim(int year, mda_strat strat){
             cout << "MF to Ant: " << init_ratio << endl;
         }
     }
-    
-    bool debug_fit = false; //prints out yearly data
 
+    if (prv_out_loc == "print"){
+        debug_fit = true;
+    }
+    
     if(ABC_fitting_init){
         output_abc_epidemics_init();
     }
@@ -56,7 +62,7 @@ void region::sim(int year, mda_strat strat){
 
         for(int day = 0; day < 364; ++day){
             
-            if (day % epi_dt == 0){
+            if (day % epi_dt == theta2*0){
                 if(!(inf_indiv.empty() & pre_indiv.empty() & uninf_indiv.empty())) { //If disease has not been eliminated
                     if (groups.size() > 1){
                         calc_risk();
@@ -244,22 +250,16 @@ void region::seed_lf_single(){
 vector<double> region::prob_worms(double prev){
     
     int n_worms  = 10; //number of worms we want to consider for init
-    double ki = 0;
-    if (ABC_fitting_init){
-        ki = agg_param;
-    }
-    else{
-        ki = init_k;
-    }
-    double alpha = 1 / ki;
-    double worm_mean = ki*(1 - pow(( 1 - prev),alpha))/pow(( 1 - prev),alpha); //mean worm burden in group (assuming negative binomial)
+   
+    double alpha = 1 / agg_param_init;
+    double worm_mean = agg_param_init*(1 - pow(( 1 - prev),alpha))/pow(( 1 - prev),alpha); //mean worm burden in group (assuming negative binomial)
    
     double worm_prob = 0.0;
     
     vector<double> cum_sum_prob;
 
     for (int i = 0; i <= n_worms; ++i){ //now working out prob of each worm burden assuming negative binomial
-        worm_prob += (tgamma(i + ki) / (tgamma(ki) * factorial(i))) * pow((worm_mean / (ki + worm_mean)),i) * pow((ki / (ki + worm_mean)),ki);
+        worm_prob += (tgamma(i + agg_param_init) / (tgamma(agg_param_init) * factorial(i))) * pow((worm_mean / (agg_param_init + worm_mean)),i) * pow((agg_param_init / (agg_param_init + worm_mean)),agg_param_init);
 
         cum_sum_prob.push_back(worm_prob); // storing
     

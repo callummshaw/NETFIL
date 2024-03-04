@@ -216,7 +216,7 @@ void region::calc_risk_single(){
 double region::mf_functional_form(char form, double worm_strength){
     if(form == 'l'){ // limitation
        
-        return theta1*worm_strength / (1 + theta2*worm_strength);
+        return theta1*theta3*(1-exp(-theta2*worm_strength));
     }
     else if(form == 'f'){ //facilitation
         

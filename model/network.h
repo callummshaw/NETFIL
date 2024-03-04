@@ -68,8 +68,9 @@ public:
     double mf_to_ant_2014; //used to save fitting data
     
     double agg_param = 1000;
-    double age_dist[n_age_groups];     //container for the age distribution
+    double agg_param_init = 1000;
 
+    double age_dist[n_age_groups];     //container for the age distribution
     int age_dist_lower[n_age_groups];
     int age_dist_upper[n_age_groups];
     //used to keep track of total population for easy analysis

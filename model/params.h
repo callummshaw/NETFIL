@@ -44,8 +44,6 @@ using namespace std;
 #define commuting_prop              0.5 //proportion of group that commut daily (over 5 years old)
 #define DailyProbLoseAntigen        0.992327946   //set so the half-life is 90 days i.e. pow(0.5,1/90)
 
-#define init_k                      0.0505
-
 #define ABC_fitting                 true
 #define ABC_fitting_init            false
 

@@ -442,16 +442,20 @@ void region::read_parameters(){
         p = strtok(NULL, " ");     double imtoant = atof(p);
         p = strtok(NULL, " ");     double inandun = atof(p);
         p = strtok(NULL, " ");     double w2n = atof(p);
+        p = strtok(NULL, " ");     double ki = atof(p);
 
         delete []str;
         in.close();
         
         theta1 = theta_1;
         theta2 = theta_2;
+        theta3 = 1 / (1 - exp(-theta2));
         agg_param = k;
         immature_to_antigen = imtoant;
         immature_and_ant = inandun;
         worktonot  = w2n;
+        agg_param_init = ki;
+
     }
     else{
         file = datadir; file = file + Tran_param;
@@ -468,6 +472,7 @@ void region::read_parameters(){
         p = strtok(NULL, ",");     double imtoant = atof(p);
         p = strtok(NULL, ",");     double inandun = atof(p);
         p = strtok(NULL, ",");     double w2n = atof(p);
+        p = strtok(NULL, ",");     double ki = atof(p);
 
         delete []str;
         in.close();
@@ -478,6 +483,7 @@ void region::read_parameters(){
         immature_to_antigen = imtoant;
         immature_and_ant = inandun;
         worktonot  = w2n;
+        agg_param_init = ki;
     }
 }
 
