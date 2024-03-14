@@ -36,7 +36,7 @@ void region::sim(int year, mda_strat strat){
     }
     
     if(ABC_fitting_init){
-        output_abc_epidemics_init();
+        if (year == 0) output_abc_epidemics_init();
     }
     else{
         handl_commute(year);
@@ -45,8 +45,9 @@ void region::sim(int year, mda_strat strat){
         if(strat.is_mda_year(year+start_year)){
             implement_MDA(year,strat);
         } 
+
         if ((ABC_fitting && debug_fit) || (!ABC_fitting && !ABC_fitting_init)){
-            output_epidemics(year, strat); 
+            //output_epidemics(year, strat); 
         }
         else{
             if (groups.size() == 1){
@@ -62,7 +63,13 @@ void region::sim(int year, mda_strat strat){
 
         for(int day = 0; day < 364; ++day){
             
-            if (day % epi_dt == theta2*0){
+            if (day % epi_dt == 0){
+                /*
+                if (day % population_dt == 0){
+                    output_epidemics(year, day, strat); 
+                }
+                */
+
                 if(!(inf_indiv.empty() & pre_indiv.empty() & uninf_indiv.empty())) { //If disease has not been eliminated
                     if (groups.size() > 1){
                         calc_risk();

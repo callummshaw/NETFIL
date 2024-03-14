@@ -47,7 +47,7 @@ void region::implement_MDA(int year, mda_strat strat){
 
 void region::handl_commute(int year){
     
-    int recalc_years = 5; //how often we want to recalc commuters
+    int recalc_years = 100; //how often we want to recalc commuters
     char distance_type = 'r'; // r for road distance, e for euclidean 
 
     //firstly need to clear previous storage
@@ -60,7 +60,7 @@ void region::handl_commute(int year){
                
                 for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
                     agent *cur = k->second; //our agent
-                    cur->night_bite_scale = bite_gamma(agg_param, 1/agg_param);
+                    //cur->night_bite_scale = bite_gamma(agg_param, agg_scale);
                 }
             }
         }
@@ -76,10 +76,7 @@ void region::handl_commute(int year){
                     
                     
                     //will update agents biting risk as well if not first year!
-                    if(year != 0){
-                        cur->day_bite_scale = bite_gamma(agg_param, 1/agg_param);
-                        cur->night_bite_scale = bite_gamma(agg_param, 1/agg_param);
-                    }
+                   
                     
                     double cum_sum_floor = 0;
                     if(random_real() > commuting_prop){ //Will not commute!
@@ -110,6 +107,7 @@ void region::handl_commute(int year){
         //we will also update all agents biting probs 
 
     }
+    
     rpop = 0;
     for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){
         group *grp = j->second;   
@@ -170,12 +168,14 @@ void region::calc_risk(){
 void region::calc_risk_single(){
     
     char form = 'l'; //l for limitation, f for facilation, or anything else for linear 
-
+    rpop = 0;
     for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //setting the force of transmission in each group to 0
         group *grp = j->second;
         grp->night_strength = 0;
+        rpop += grp->group_pop.size();
     }
     
+  
     //Finding strength of infection in each group
     //now looping over all infected agents
     for(map<int, agent*>::iterator j = inf_indiv.begin(); j != inf_indiv.end(); ++j){
@@ -188,7 +188,7 @@ void region::calc_risk_single(){
 
         if(age <= 15) c = exposure_by_age[age];
              
-        ngrp->night_strength += c*mf_functional_form(form, j->second->worm_strength) / (double) ngrp->day_population.size();
+        ngrp->night_strength += c*mf_functional_form(form, j->second->worm_strength) / (double) rpop;
     }
                             
 

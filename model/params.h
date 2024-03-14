@@ -29,11 +29,11 @@ using namespace std;
 
 #define max_init_age                80 //maximum age of agent upon init
 
-#define init_prev_min               2.75 //minimum initial antigen prev
-#define init_prev_max               3.75 //maximum initial antigen prev
+#define init_prev_min               3.15 //minimum initial antigen prev
+#define init_prev_max               3.35 //maximum initial antigen prev
 
-#define init_ratio_min              0.15
-#define init_ratio_max              0.18
+#define init_ratio_min              0.155
+#define init_ratio_max              0.175
 
 #define ant_0                       0.0325 //initial antigen prev
 #define sigma_g                     1.1311//Household standard dev
@@ -46,6 +46,8 @@ using namespace std;
 
 #define ABC_fitting                 true
 #define ABC_fitting_init            false
+
+#define run_off_fitted              false
 
 double random_real();
 double normal(double mean, double stddev);

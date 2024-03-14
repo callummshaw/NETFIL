@@ -1,4 +1,5 @@
 #include "network.h"
+#include "rng.h"
 #include <stdio.h>
 #include <string.h>
 #include <cstring>
@@ -428,6 +429,7 @@ void region::read_parameters(){
     }
     
     if (ABC_fitting || ABC_fitting_init){
+
         file = Tran_param;
         in.open(file.c_str());
         getline(in, line);
@@ -451,6 +453,7 @@ void region::read_parameters(){
         theta2 = theta_2;
         theta3 = 1 / (1 - exp(-theta2));
         agg_param = k;
+        agg_scale = 1 / k;
         immature_to_antigen = imtoant;
         immature_and_ant = inandun;
         worktonot  = w2n;
@@ -458,32 +461,140 @@ void region::read_parameters(){
 
     }
     else{
-        file = datadir; file = file + Tran_param;
-        in.open(file.c_str());
-        getline(in, line);
-        getline(in,line);
-        char *str = new char[line.size()+1];
-        strcpy(str, line.c_str());
-        char *p = NULL;
-    
-        p = strtok(str, ",");      double theta_1 = atof(p);
-        p = strtok(NULL, ",");     double theta_2 = atof(p);
-        p = strtok(NULL, ",");     double k = atof(p);
-        p = strtok(NULL, ",");     double imtoant = atof(p);
-        p = strtok(NULL, ",");     double inandun = atof(p);
-        p = strtok(NULL, ",");     double w2n = atof(p);
-        p = strtok(NULL, ",");     double ki = atof(p);
-
-        delete []str;
-        in.close();
+        if (!run_off_fitted){ //running from point estimates from Trans-Params
+            file = datadir; file = file + Tran_param;
+            in.open(file.c_str());
+            getline(in, line);
+            getline(in,line);
+            char *str = new char[line.size()+1];
+            strcpy(str, line.c_str());
+            char *p = NULL;
         
-        theta1 = theta_1;
-        theta2 = theta_2;
-        agg_param = k;
-        immature_to_antigen = imtoant;
-        immature_and_ant = inandun;
-        worktonot  = w2n;
-        agg_param_init = ki;
+            p = strtok(str, ",");      double theta_1 = atof(p);
+            p = strtok(NULL, ",");     double theta_2 = atof(p);
+            p = strtok(NULL, ",");     double k = atof(p);
+            p = strtok(NULL, ",");     double imtoant = atof(p);
+            p = strtok(NULL, ",");     double inandun = atof(p);
+            p = strtok(NULL, ",");     double w2n = atof(p);
+            p = strtok(NULL, ",");     double ki = atof(p);
+
+            delete []str;
+            in.close();
+            
+            theta1 = theta_1;
+            theta2 = theta_2;
+            theta3 = 1 / (1 - exp(-theta2));
+            agg_param = k;
+            agg_scale = 1 / k;
+            immature_to_antigen = imtoant;
+            immature_and_ant = inandun;
+            worktonot  = w2n;
+            agg_param_init = ki;
+        }
+        else if (run_off_fitted){
+                        
+            
+            file = datadir; file = file + Tran_param;
+            
+            in.open(file.c_str());
+            getline(in, line);
+            getline(in,line);
+            char *str = new char[line.size()+1];
+            strcpy(str, line.c_str());
+            char *p = NULL;
+        
+            p = strtok(str, ",");      double theta_1 = atof(p);
+            p = strtok(NULL, ",");     double theta_2 = atof(p);
+            p = strtok(NULL, ",");     double k = atof(p);
+            p = strtok(NULL, ",");     double imtoant = atof(p);
+            p = strtok(NULL, ",");     double inandun = atof(p);
+            p = strtok(NULL, ",");     double w2n = atof(p);
+            p = strtok(NULL, ",");     double ki = atof(p);
+
+            delete []str;
+            in.close();
+            
+            immature_to_antigen = imtoant;
+            immature_and_ant = inandun;
+            agg_param_init = ki;
+            
+            //Theta1
+            string loc = "Fitted/Theta1.txt";
+            vector<double> values;
+            int n_values;
+            int w_value;
+
+            file = datadir; file = datadir + loc;
+            in.open(file.c_str());
+            
+            while(getline(in, line)){
+                values.push_back(atof(line.c_str()));
+            }
+            in.close();
+
+            shuffle(values.begin(),values.end(), gen);
+           
+            theta1 = values[1];
+           
+            values.clear();
+            values.shrink_to_fit();
+
+            loc = "Fitted/Theta2.txt";
+
+            file = datadir; file = datadir + loc;
+            in.open(file.c_str());
+          
+            while(getline(in, line)){
+                values.push_back(atof(line.c_str()));
+            }
+            in.close();
+        
+            shuffle(values.begin(),values.end(), gen);
+            
+            theta2 = values[1];
+            theta3 = 1 / (1 - exp(-theta2));
+             
+            values.clear();
+            values.shrink_to_fit();
+            
+
+            loc = "Fitted/Agg.txt";
+            file = datadir; file = datadir + loc;
+            in.open(file.c_str());
+          
+            while(getline(in, line)){
+                values.push_back(atof(line.c_str()));
+            }
+            in.close();
+
+            shuffle(values.begin(),values.end(), gen);
+            
+            agg_param = values[1];
+            agg_scale = 1 / agg_param;
+            
+            values.clear();
+            values.shrink_to_fit();
+           
+            if (group_blocks > 1){
+                loc = "Fitted/Work.txt";
+                file = datadir; file = datadir + loc;
+                in.open(file.c_str());
+
+                while(getline(in, line)){
+                    values.push_back(atof(line.c_str()));
+                }
+                in.close();
+                shuffle(values.begin(),values.end(), gen);
+                worktonot = values[1];
+
+                values.clear();
+                values.shrink_to_fit();
+            }
+            else {
+                worktonot = 0.1; 
+            }
+
+        }
     }
 }
 

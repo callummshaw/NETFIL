@@ -8,7 +8,7 @@
 using namespace std;
 
  
-int SimulationNumber;
+int SimulationNumber = 0;
 
 string prv_out_loc;
 
@@ -42,7 +42,10 @@ int main(int argc, const char * argv[]){
                 rgn->sim(year, strategy);
               
             }
+
+            SimulationNumber += 1;
         }
+
     }
 
     return 0;

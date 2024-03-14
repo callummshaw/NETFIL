@@ -1,11 +1,11 @@
 #include "network.h"
+#include "rng.h"
 #include <cstring>
-
 
 extern string prv_out_loc;
 extern int SimulationNumber;
 
-void region::output_epidemics(int year, mda_strat strategy){
+void region::output_epidemics(int year, int day, mda_strat strategy){
     
     // community based
     double pop_0_9 = 0;
@@ -115,7 +115,7 @@ void region::output_epidemics(int year, mda_strat strategy){
                 if(age >=70 && age <=79)++inf_70_79;
                 if(age >=80)++inf_80_plus;
             }
-            if(a->status == 'I' || a->status == 'U'|| random_real() < pow(DailyProbLoseAntigen, year*365 - a->lastwormtime) ){ //all people infected with any number of mature worms or who still have lingering antibodies are counted
+            if(a->status == 'I' || a->status == 'U'|| random_real() < pow(DailyProbLoseAntigen, (year*365 +day) - a->lastwormtime) ){ //all people infected with any number of mature worms or who still have lingering antibodies are counted
                 
                 ++antigen_pos_groups[j->first - 1];
                 ++ant_total;
@@ -135,21 +135,29 @@ void region::output_epidemics(int year, mda_strat strategy){
         }
 
     }
-
+    if (day == 0){
     cout << endl;
+    
     cout << year+start_year << ": " << "prepatent = " << pre_indiv.size() << " uninfectious = " << uninf_indiv.size() << " infectious = " << inf_indiv.size() << " antigen positive = " << ant_total << endl;
     cout << "overall mf prevalence = " << fixed << setprecision(2) << inf_indiv.size()/(double)rpop*100 << "%" << endl;
     cout<< "overall ant prevalence = " << fixed << setprecision(2) << ant_total/(double)rpop*100 << "%" << endl;
     cout<< "overall ratio prevalence = " << fixed << setprecision(2) << ant_total/inf_total << endl;
-
+    }
     string prv_dat = outdir;    prv_dat = prv_dat + prv_out_loc; 
-
     ofstream out;   ifstream in;
     in.open(prv_dat.c_str()); // try opening the target for output
     if(!in){ // if it doesn't exist write a heading
         out.open(prv_dat.c_str());
         out << "SimulationNumber,";
         out << "Year,";
+        out << "Day,";
+        out << "InitAgg,";
+        out << "Agg,";
+        out << "Theta1,";
+        out << "Theta2,";
+        out << "WorktoNot,";
+        out << "AntandImmature,";
+        out << "OnlyImmature,"; 
         out << "MDACoverageAttempted,";
         out << "MDAKillProb,";
         out << "MDAFullSterProb,";
@@ -222,6 +230,14 @@ void region::output_epidemics(int year, mda_strat strategy){
     
     out << SimulationNumber << ",";
     out << year + start_year << ",";
+    out << day << ",";
+    out << agg_param_init << ",";
+    out << agg_param << ",";
+    out << theta1 << ",";
+    out << theta2 << ",";
+    out << worktonot << ",";
+    out << immature_and_ant  << ",";
+    out << immature_to_antigen << ",";
     out << strategy.Coverage << ",";
     out << strategy.drug.KillProb << ",";
     out << strategy.drug.FullSterProb << ",";
@@ -391,7 +407,7 @@ void region::output_abc_epidemics_single(int year){
 void region::output_abc_epidemics(int year){
 
     int icc_2016 = 0;
-    int all_2016 = 2500; //number of people we need for ICC calc
+    int all_2016 = 1000; //number of people we need for ICC calc
 
     vector<int> group_number;
     vector<float> agev;
@@ -445,7 +461,7 @@ void region::output_abc_epidemics(int year){
             keys.push_back(i + 1);
         }
 
-        random_shuffle(keys.begin(),keys.end());
+        shuffle(keys.begin(),keys.end(),gen);
 
         for (auto const &i: keys) {//iterating through groups
             int npeople = 0;

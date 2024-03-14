@@ -55,8 +55,11 @@ void agent::sim_bites(double c, double worktonot){
 }
 
 void agent::sim_bites_single(double c){
+
     int total_bites;
+    
     total_bites = poisson(c * ngp->night_strength * night_bite_scale);
+
     for(int i = 0; i < total_bites; ++i){ //looping through infective bites and assigning worms
         int immature_period = normal(immature_period_mean, immature_period_mean_std); //immature period of worm
         int mature_period = normal(mature_period_mean, mature_period_mean_std); //mature period of worm

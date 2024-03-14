@@ -1,7 +1,7 @@
 #ifndef RANDOM_GEN_H
 #define RANDOM_GEN_H
-using namespace std;
 #include <random>
+using namespace std;
 
 extern mt19937 gen; // Declaration of the generator
 

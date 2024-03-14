@@ -56,19 +56,20 @@ public:
     int next_aid;                      //agent ID tracker for births
     bool init;                         // Has the population been built before?    
     
-    double theta1 = 0;                      //transmission parameters for the different mf maturation scalings!
-    double theta2 = 0;
-    double theta3 = 0;
+    double theta1;                      //transmission parameters for the different mf maturation scalings!
+    double theta2;
+    double theta3;
 
-    double immature_to_antigen = 0;     //at init the ratio of people with just immature worms to antigen positive people (fitted) 
-    double immature_and_ant = 0;       //at init the ratio of people with people who are ant pos but mf negative with immature worms
+    double immature_to_antigen;     //at init the ratio of people with just immature worms to antigen positive people (fitted) 
+    double immature_and_ant;       //at init the ratio of people with people who are ant pos but mf negative with immature worms
 
     double worktonot = 0;               //where to a majaortiy of bites occur?
 
     double mf_to_ant_2014; //used to save fitting data
     
-    double agg_param = 1000;
-    double agg_param_init = 1000;
+    double agg_param;
+    double agg_scale;
+    double agg_param_init;
 
     double age_dist[n_age_groups];     //container for the age distribution
     int age_dist_lower[n_age_groups];
@@ -135,7 +136,7 @@ public:
 
     void reset_population();
     void reset_prev();
-    void output_epidemics(int year, mda_strat strategy);    //output outbreak data
+    void output_epidemics(int year, int day, mda_strat strategy);    //output outbreak data
     void output_abc_epidemics(int year);
     void output_abc_epidemics_single(int year);
     void output_abc_epidemics_init();
