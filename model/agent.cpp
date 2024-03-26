@@ -79,7 +79,7 @@ void agent::mda(drugs drug){
     if(wvec.size() > 0){ //if person has worms
         double rr = random_real(); //same thing will occur to all worms!
         for(int i = 0; i < wvec.size(); i++){ // looping through worms
-            wvec[i]->age_mda = drug.SterDur;
+            wvec[i]->age_mda = drug.SterDur*365;
             if (rr <= drug.KillProb){
                 wvec[i]->status = 'D';
             }

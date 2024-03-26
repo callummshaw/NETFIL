@@ -54,17 +54,7 @@ void region::handl_commute(int year){
    
     if (year % recalc_years == 0){    
         
-        if((groups.size() == 1) & (year != 0)){
-            for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //now using the network
-                group *grp = j->second;
-               
-                for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
-                    agent *cur = k->second; //our agent
-                    //cur->night_bite_scale = bite_gamma(agg_param, agg_scale);
-                }
-            }
-        }
-        else if (groups.size() > 1){
+        if (groups.size() > 1){
             radt_model(distance_type); //generating commuting network
             for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //now using the network
                 group *grp = j->second;
@@ -73,10 +63,6 @@ void region::handl_commute(int year){
                 //now iterating over all group members
                 for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
                     agent *cur = k->second; //our agent
-                    
-                    
-                    //will update agents biting risk as well if not first year!
-                   
                     
                     double cum_sum_floor = 0;
                     if(random_real() > commuting_prop){ //Will not commute!

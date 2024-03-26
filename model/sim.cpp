@@ -64,11 +64,11 @@ void region::sim(int year, mda_strat strat){
         for(int day = 0; day < 364; ++day){
             
             if (day % epi_dt == 0){
-                /*
+                
                 if (day % population_dt == 0){
                     output_epidemics(year, day, strat); 
                 }
-                */
+                
 
                 if(!(inf_indiv.empty() & pre_indiv.empty() & uninf_indiv.empty())) { //If disease has not been eliminated
                     if (groups.size() > 1){

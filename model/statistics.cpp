@@ -91,7 +91,7 @@ void region::output_epidemics(int year, int day, mda_strat strategy){
             if(age >=80)++pop_80_plus;
 
             if(a->status == 'I'){//person is infectious
-
+                ++inf_groups[j->first - 1];
                 double ws = a->worm_strength;
                 ++inf_total;
                 if (ws <= 1) ++one_mated_adult;
@@ -213,12 +213,14 @@ void region::output_epidemics(int year, int day, mda_strat strategy){
         out << "eight_mated,";
         out << "nine_mated,";
         out << "tenplus_mated,";
-
         for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){
-            out << "Prevalence" << group_numbers[j -> second -> gid] << ","; //For each village prints "Prevalence<Village Name>,"
+            out << "pop_" << group_numbers[j -> second -> gid] << ","; 
         }
         for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){
-            out << "Prev_Antigen" << group_numbers[j -> second -> gid] << ","; //For each village prints "Prev_Antigen<Village Name>,"
+            out << "mf_" << group_numbers[j -> second -> gid] << ","; 
+        }
+        for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){
+            out << "ant_" << group_numbers[j -> second -> gid] << ","; 
         }
         out << endl;
         out.close();
@@ -292,7 +294,11 @@ void region::output_epidemics(int year, int day, mda_strat strategy){
     out << eight_mated_adult << ",";
     out << nine_mated_adult << ",";
     out << tenplus_mated_adult<< ",";
-
+    for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){
+        double n_village = (j -> second -> group_pop).size();
+        if(n_village==0) out << "NA,"; // there's a chance that populations in small villages might drop to zero - this is to avoid crashes in that situation
+        else out << n_village << ",";
+    }
     for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){
         double n_village = (j -> second -> group_pop).size();
         if(n_village==0) out << "NA,"; // there's a chance that populations in small villages might drop to zero - this is to avoid crashes in that situation
@@ -301,7 +307,7 @@ void region::output_epidemics(int year, int day, mda_strat strategy){
     for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){
         double n_village = (j -> second -> group_pop).size();
         if(n_village==0) out << "NA,"; // there's a chance that populations in small villages might drop to zero - this it to avoid crashes in that situation
-        else out <<  antigen_pos_groups[j -> first - 1]/(double)n_village << ",";
+        else out <<  antigen_pos_groups[j -> first - 1] << ",";
     }
 
     out << endl;

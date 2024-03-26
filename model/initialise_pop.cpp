@@ -16,11 +16,6 @@ region::region(int rid, string rname){
     next_gid = 1;
     group_blocks = 0;
 
-    for(int i = 0; i < n_age_groups; i++){
-        age_dist_lower[i] = i*5;
-        age_dist_upper[i] = i*5 + 4;
-    };
-
     //Distances
     euclid_dst = NULL;
     road_dst = NULL;
@@ -206,7 +201,9 @@ void region::read_groups(){
         int pop = 0;
 
         p = std::strtok(NULL, ", ");    pop = atoi(p);
-        
+        if (pop == 0){
+            cout << "Warning!!!!!!" << endl;
+        }
         group_pops.insert(pair<int, int>(gid, pop));
     
         delete []str;
@@ -692,21 +689,29 @@ void group::bld_group_pop(){
     int group_population = rgn->group_pops[gid];
     double* age_dist = rgn->age_dist;
     
-    for(int i = 0; i< n_age_groups; i++){
-        if (age_dist[i] == 0) continue;
-
-        int lower_bound = rgn->age_dist_lower[i]; //lower bound of our age bracket
-        int upper_bound = rgn->age_dist_upper[i]; //upper_band of our age bracket
-
-        int pp = group_population*age_dist[i];
-
-        while(pp-- > 0){
-            int id = rgn->next_aid++;
-            int age = 365*(lower_bound + (upper_bound - lower_bound)*random_real()); // age 
-            agent *p = new agent(id,rgn->agg_param,age); //creating new agent of correct age!
-            add_member(p);
+    while(group_population > 0 ){
+        double age_p = random_real();
+        for(int i = 0; i < n_age_groups; ++i){
+            int lower_bound = 5*i; //lower bound of our age bracket
+            int upper_bound = 5*i+4;
+            
+            double ll = age_dist[i];
+            double uu = age_dist[i+1];
+            
+            if ((age_p >= ll) && (age_p < uu)){
+                int id = rgn->next_aid++;
+                int age = 365*(lower_bound + (upper_bound - lower_bound)*random_real()); // age 
+                agent *p = new agent(id,rgn->agg_param,age); //creating new agent of correct age!
+                add_member(p);
+                if (age/365 > 80){
+                    cout << i << endl;
+                    cout << lower_bound << endl;
+                    cout << upper_bound << endl;
+                }
+                break;
+            }
         }
-
+        group_population--;
     }
 }
 
