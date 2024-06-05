@@ -514,7 +514,9 @@ void region::read_parameters(){
             immature_to_antigen = imtoant;
             immature_and_ant = inandun;
             agg_param_init = ki;
-            
+            theta2 = theta_2;
+            theta3 = 1 / (1 - exp(-theta2));
+
             //Theta1
             string loc = "Fitted/Theta1.txt";
             vector<double> values;
@@ -534,26 +536,7 @@ void region::read_parameters(){
             theta1 = values[1];
            
             values.clear();
-            values.shrink_to_fit();
-
-            loc = "Fitted/Theta2.txt";
-
-            file = datadir; file = datadir + loc;
-            in.open(file.c_str());
-          
-            while(getline(in, line)){
-                values.push_back(atof(line.c_str()));
-            }
-            in.close();
-        
-            shuffle(values.begin(),values.end(), gen);
-            
-            theta2 = values[1];
-            theta3 = 1 / (1 - exp(-theta2));
-             
-            values.clear();
-            values.shrink_to_fit();
-            
+            values.shrink_to_fit(); 
 
             loc = "Fitted/Agg.txt";
             file = datadir; file = datadir + loc;

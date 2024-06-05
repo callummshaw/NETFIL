@@ -302,7 +302,7 @@ void region::output_epidemics(int year, int day, mda_strat strategy){
     for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){
         double n_village = (j -> second -> group_pop).size();
         if(n_village==0) out << "NA,"; // there's a chance that populations in small villages might drop to zero - this is to avoid crashes in that situation
-        else out <<  inf_groups[j -> first - 1]/(double)n_village << ",";
+        else out <<  inf_groups[j -> first - 1] << ",";
     }
     for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){
         double n_village = (j -> second -> group_pop).size();

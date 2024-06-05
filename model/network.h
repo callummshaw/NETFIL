@@ -18,6 +18,9 @@ public:
     double day_strength;            //strength of infection during the day
     double night_strength;           //strength of infection during the day
     
+    double day_bites;
+    double night_bites;
+
     double lat, lon;                    //latitude & longitude
     region *rgn;                       //region!
     double sum_mf;                      //NEED TO DEFINE
@@ -30,6 +33,8 @@ public:
         double dis; //the distance!
         c_node(int gid, double dis): gid(gid), dis(dis) {}
     };
+
+    double total_commute = 0; //total commuters
 
     vector<c_node*> commuting_dist; //storing the distances
     map<int, double> commuting_pop; //the prop of commuters from each location

@@ -59,13 +59,13 @@ void region::handl_commute(int year){
             for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //now using the network
                 group *grp = j->second;
                 int no_commute_id = grp->gid;
-            
+                double commuter_prop = grp->total_commute / (double) grp->group_pop.size();
                 //now iterating over all group members
                 for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
                     agent *cur = k->second; //our agent
                     
                     double cum_sum_floor = 0;
-                    if(random_real() > commuting_prop){ //Will not commute!
+                    if(random_real() > commuter_prop){ //Will not commute!
                         grp->day_population.insert(pair<int, agent*>(cur->aid, cur)); //storing them in current group for day population
                         cur->dgp = groups[no_commute_id];
                     } 
@@ -107,8 +107,25 @@ void region::calc_risk(){
 
     for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //setting the force of transmission in each group to 0
         group *grp = j->second;
+        
         grp->day_strength = 0;
         grp->night_strength = 0;
+        grp->night_bites = 0;
+        grp->day_bites = 0;
+
+        double db = 0;
+        double nb = 0;
+
+        for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
+            nb += k->second->night_bite_scale;    
+        }
+
+        for(map<int, agent*>::iterator k = grp->day_population.begin(); k != grp->day_population.end(); ++k){
+            db += k->second->day_bite_scale;    
+        }
+        
+        grp->night_bites = nb;
+        grp->day_bites = db;
     }
     
     //Finding strength of infection in each group
@@ -124,8 +141,8 @@ void region::calc_risk(){
 
         if(age <= 15) c = exposure_by_age[age];
              
-        dgrp->day_strength += c*mf_functional_form(form, j->second->worm_strength) / (double) dgrp->day_population.size();
-        ngrp->night_strength += c*mf_functional_form(form, j->second->worm_strength) / (double) ngrp->day_population.size();
+        dgrp->day_strength += c*mf_functional_form(form, j->second->worm_strength) / dgrp->day_bites;
+        ngrp->night_strength += c*mf_functional_form(form, j->second->worm_strength) / ngrp->night_bites;
     }
     
     //Now finding infective bites
