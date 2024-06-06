@@ -112,16 +112,23 @@ void region::calc_risk(){
         grp->night_strength = 0;
         grp->night_bites = 0;
         grp->day_bites = 0;
-
         double db = 0;
         double nb = 0;
 
         for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
-            nb += k->second->night_bite_scale;    
+            agent *cur =k->second;
+            int age = int(cur->age / 365);
+            double c = 1.0;
+            if(age <= 15) c = exposure_by_age[age];
+            nb += cur->night_bite_scale*c;    
         }
 
         for(map<int, agent*>::iterator k = grp->day_population.begin(); k != grp->day_population.end(); ++k){
-            db += k->second->day_bite_scale;    
+            agent *cur =k->second;
+            int age = int(cur->age / 365);
+            double c = 1.0;
+            if(age <= 15) c = exposure_by_age[age];
+            db += cur->day_bite_scale*c;    
         }
         
         grp->night_bites = nb;
@@ -141,10 +148,10 @@ void region::calc_risk(){
 
         if(age <= 15) c = exposure_by_age[age];
              
-        dgrp->day_strength += c*mf_functional_form(form, j->second->worm_strength) / dgrp->day_bites;
-        ngrp->night_strength += c*mf_functional_form(form, j->second->worm_strength) / ngrp->night_bites;
+        dgrp->day_strength += c*cur->day_bite_scale*mf_functional_form(form, j->second->worm_strength) / dgrp->day_bites;
+        ngrp->night_strength += c*cur->night_bite_scale*mf_functional_form(form, j->second->worm_strength) / ngrp->night_bites;
     }
-    
+
     //Now finding infective bites
     
     for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //looping over groups
