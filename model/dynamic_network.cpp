@@ -147,7 +147,7 @@ void region::calc_risk(){
         double c = 1.0;
 
         if(age <= 15) c = exposure_by_age[age];
-             
+       
         dgrp->day_strength += c*cur->day_bite_scale*mf_functional_form(form, j->second->worm_strength) / dgrp->day_bites;
         ngrp->night_strength += c*cur->night_bite_scale*mf_functional_form(form, j->second->worm_strength) / ngrp->night_bites;
     }
@@ -177,13 +177,38 @@ void region::calc_risk(){
 
 void region::calc_risk_single(){
     
-    char form = 'l'; //l for limitation, f for facilation, or anything else for linear 
-    rpop = 0;
     for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){ //setting the force of transmission in each group to 0
         group *grp = j->second;
+        
+        
         grp->night_strength = 0;
-        rpop += grp->group_pop.size();
+        grp->night_bites = 0;
+
+        double db = 0;
+        double nb = 0;
+
+        for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
+            agent *cur =k->second;
+            int age = int(cur->age / 365);
+            double c = 1.0;
+            if(age <= 15) c = exposure_by_age[age];
+            nb += cur->night_bite_scale*c;    
+        }
+
+        for(map<int, agent*>::iterator k = grp->day_population.begin(); k != grp->day_population.end(); ++k){
+            agent *cur =k->second;
+            int age = int(cur->age / 365);
+            double c = 1.0;
+            if(age <= 15) c = exposure_by_age[age];
+            db += cur->day_bite_scale*c;    
+        }
+        
+        grp->night_bites = nb;
+        grp->day_bites = db;
     }
+
+    char form = 'l'; //l for limitation, f for facilation, or anything else for linear 
+   
     
   
     //Finding strength of infection in each group
@@ -198,7 +223,7 @@ void region::calc_risk_single(){
 
         if(age <= 15) c = exposure_by_age[age];
              
-        ngrp->night_strength += c*mf_functional_form(form, j->second->worm_strength) / (double) rpop;
+        ngrp->night_strength += c*cur->night_bite_scale*mf_functional_form(form, j->second->worm_strength) / ngrp->night_bites;
     }
                             
 

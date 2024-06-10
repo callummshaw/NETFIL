@@ -52,13 +52,12 @@ void region::sim(int year, mda_strat strat){
         }
 
         
-        int epi_dt = 28; 
+        int epi_dt = 14; 
         int population_dt = 28;
 
         for(int day = 0; day < 364; ++day){
             
             if (day % epi_dt == 0){
-
                 if(!(inf_indiv.empty() & pre_indiv.empty() & uninf_indiv.empty())) { //If disease has not been eliminated
                     if (groups.size() > 1){
                         calc_risk();
