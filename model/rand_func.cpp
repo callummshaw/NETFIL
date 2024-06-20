@@ -26,3 +26,18 @@ double bite_gamma(double shape, double scale){
 
     return distribution(gen);
 }
+
+double init_beta(double a, double b){
+    
+    gamma_distribution<> X(a, 1.0);
+    gamma_distribution<> Y(b, 1.0);
+
+    double x = X(gen);
+    double y = Y(gen);
+
+    return  x / (x + y);
+}
+
+void partial_shuffle(vector<double>& vec, int start, int end){
+   shuffle(vec.begin() + start, vec.begin() + end, gen);
+}

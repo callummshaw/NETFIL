@@ -43,11 +43,7 @@ public:
     
     int aid; // agent's id
     int age; // agent's age
-    
-
-    double day_bite_scale;
-    double night_bite_scale;
-
+    double bite_scale;
     char status; // epi status S = no worms, E = immature only, U = mature but only single sex (ant postive), I =  multiple mature worms (mf postive) 
     
     double lastwormtime; // time since last adult worm

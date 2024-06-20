@@ -647,6 +647,7 @@ void region::reset_prev(){
     pre_indiv.clear();
     inf_indiv.clear();
     uninf_indiv.clear();
+    no_worms_indiv.clear();
 }
 //constructer of groups
 group::group(int gid, region *rgn, double lat, double lon){

@@ -83,7 +83,7 @@ public:
     map<int, agent*> pre_indiv;        //collection of immautre worms individuals
     map<int, agent*> inf_indiv;        //collection ofinfectious individuals
     map<int, agent*> uninf_indiv;      //collection of peple with adult worms but are uninfectious individuals (single gender or sterile)
-
+    map<int, agent*> no_worms_indiv;   //collection of people with no worms!
     vector<agent*> pvec[n_age_groups]; //storing all people of certain age group
 
     //now all the information about the groups

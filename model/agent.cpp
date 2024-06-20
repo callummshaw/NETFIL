@@ -15,8 +15,7 @@ agent::agent(int aid,  double bite_shape, int age){
 
     lastwormtime = - std::numeric_limits<double>::infinity();
 
-    day_bite_scale = bite_gamma(bite_shape, 1/bite_shape);
-    night_bite_scale = bite_gamma(bite_shape, 1/bite_shape);
+    bite_scale = bite_gamma(bite_shape, 1/bite_shape);
 }
 
 agent::~agent(){
@@ -34,8 +33,8 @@ void agent::sim_bites(double c, double worktonot){
     int night_bites;
     int total_bites;
 
-    day_bites  = poisson(c *  dgp->day_strength * day_bite_scale * worktonot);
-    night_bites = poisson(c * ngp->night_strength * night_bite_scale * (1.0 - worktonot));
+    day_bites  = poisson(c *  dgp->day_strength * bite_scale * worktonot);
+    night_bites = poisson(c * ngp->night_strength * bite_scale * (1.0 - worktonot));
 
     total_bites = day_bites + night_bites;
     
@@ -57,8 +56,8 @@ void agent::sim_bites(double c, double worktonot){
 void agent::sim_bites_single(double c){
 
     int total_bites;
-    
-    total_bites = poisson(c * ngp->night_strength * night_bite_scale);
+   
+    total_bites = poisson(c * ngp->night_strength * bite_scale);
 
     for(int i = 0; i < total_bites; ++i){ //looping through infective bites and assigning worms
         int immature_period = normal(immature_period_mean, immature_period_mean_std); //immature period of worm

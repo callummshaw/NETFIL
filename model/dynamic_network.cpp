@@ -120,7 +120,7 @@ void region::calc_risk(){
             int age = int(cur->age / 365);
             double c = 1.0;
             if(age <= 15) c = exposure_by_age[age];
-            nb += cur->night_bite_scale*c;    
+            nb += cur->bite_scale*c;    
         }
 
         for(map<int, agent*>::iterator k = grp->day_population.begin(); k != grp->day_population.end(); ++k){
@@ -128,7 +128,7 @@ void region::calc_risk(){
             int age = int(cur->age / 365);
             double c = 1.0;
             if(age <= 15) c = exposure_by_age[age];
-            db += cur->day_bite_scale*c;    
+            db += cur->bite_scale*c;    
         }
         
         grp->night_bites = nb;
@@ -148,8 +148,8 @@ void region::calc_risk(){
 
         if(age <= 15) c = exposure_by_age[age];
        
-        dgrp->day_strength += c*cur->day_bite_scale*mf_functional_form(form, j->second->worm_strength) / dgrp->day_bites;
-        ngrp->night_strength += c*cur->night_bite_scale*mf_functional_form(form, j->second->worm_strength) / ngrp->night_bites;
+        dgrp->day_strength += (c*cur->bite_scale*mf_functional_form(form, j->second->worm_strength)) / dgrp->day_bites;
+        ngrp->night_strength += (c*cur->bite_scale*mf_functional_form(form, j->second->worm_strength)) / ngrp->night_bites;
     }
 
     //Now finding infective bites
@@ -184,7 +184,6 @@ void region::calc_risk_single(){
         grp->night_strength = 0;
         grp->night_bites = 0;
 
-        double db = 0;
         double nb = 0;
 
         for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
@@ -192,19 +191,11 @@ void region::calc_risk_single(){
             int age = int(cur->age / 365);
             double c = 1.0;
             if(age <= 15) c = exposure_by_age[age];
-            nb += cur->night_bite_scale*c;    
+            nb += cur->bite_scale*c;    
         }
 
-        for(map<int, agent*>::iterator k = grp->day_population.begin(); k != grp->day_population.end(); ++k){
-            agent *cur =k->second;
-            int age = int(cur->age / 365);
-            double c = 1.0;
-            if(age <= 15) c = exposure_by_age[age];
-            db += cur->day_bite_scale*c;    
-        }
         
         grp->night_bites = nb;
-        grp->day_bites = db;
     }
 
     char form = 'l'; //l for limitation, f for facilation, or anything else for linear 
@@ -217,13 +208,13 @@ void region::calc_risk_single(){
         
         agent *cur =j->second;
         group *ngrp = cur->ngp; //infected agents nightime group
-
+        //cout << cur->bite_scale << endl;
         int age = int(cur->age / 365);
         double c = 1.0;
 
         if(age <= 15) c = exposure_by_age[age];
              
-        ngrp->night_strength += c*cur->night_bite_scale*mf_functional_form(form, j->second->worm_strength) / ngrp->night_bites;
+        ngrp->night_strength += (c*cur->bite_scale*mf_functional_form(form, j->second->worm_strength)) / ngrp->night_bites;
     }
                             
 
