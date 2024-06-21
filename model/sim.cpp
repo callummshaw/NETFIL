@@ -16,15 +16,10 @@ void region::sim(int year, mda_strat strat){
         init_prev = 0;
         init_ratio  = 0;
         while(((init_prev < init_prev_min) || (init_prev > init_prev_max)) || ((init_ratio < init_ratio_min) || (init_ratio > init_ratio_max))){
-            if (groups.size() > 1){
-                seed_lf();
-                if( ABC_fitting_init) break;
-            }
-            else{
-                seed_lf_single();
-                cout << init_prev << endl;
-                if( ABC_fitting_init) break;
-            }
+            
+            seed_lf();
+            if( ABC_fitting_init) break;
+           
         }
         if (!ABC_fitting_init){
             cout << "Init prev: " << init_prev << "%" << endl;
@@ -90,6 +85,7 @@ void region::sim(int year, mda_strat strat){
 void region::seed_lf(){
     reset_prev();
     double ant_pos = 0;
+    double group_prev;
     vector<double> bite_scales {};
 
     //iterating over groups
@@ -97,9 +93,13 @@ void region::seed_lf(){
         
         group *grp = j->second;
 
-        double group_effect = normal(0.0,sigma_g);
-        double group_log_odds = group_effect + beta_0;
-        double group_prev = 1/(1+exp(-group_log_odds)); //prev in our group
+        if (groups.size() > 1){
+            double group_effect = normal(0.0,sigma_g);
+            double group_log_odds = group_effect + beta_0;
+            group_prev = 1/(1+exp(-group_log_odds));
+        } else{
+            group_prev = ant_0;
+        } 
      
         vector<double> cum_sum_prob = prob_worms(group_prev); //found the prob of different worm burdens in village assuming negative bionmial
         //iterating over group members!                        uninf_indiv.insert(pair<int, agent*>(cur->aid, cur));
@@ -122,7 +122,7 @@ void region::seed_lf(){
                 for(int i = 1; i <= worm_count; ++ i){
                     double mature_period;
                   
-                    mature_period = (1-init_beta(1,1.4))*normal(mature_period_mean,mature_period_mean_std);
+                    mature_period = (1-init_beta(init_year_dist_a,init_year_dist_b))*normal(mature_period_mean,mature_period_mean_std);
                     if(random_real() < proportion_male_agent){ //has one male mature
                         cur->wvec.push_back(new worm('M', 0, mature_period ,'M'));
                         ++wm;
@@ -145,7 +145,7 @@ void region::seed_lf(){
 
                 if(random_real() <= immature_and_ant){ //assigning immature worms to ant positive 
                     int n_worms;
-                    n_worms = max(poisson(1),1);
+                    n_worms = max(poisson(init_immature_worms),1);
                 
                     for(int i = 1; i <= n_worms; ++ i){ 
                         double immature_period = random_real()*normal(immature_period_mean,immature_period_mean_std);
@@ -166,7 +166,7 @@ void region::seed_lf(){
                 pre_indiv.insert(pair<int, agent*>(cur->aid, cur));
 
                 int n_worms;
-                n_worms = max(poisson(1),1);
+                n_worms = max(poisson(init_immature_worms),1);
                 
                 for(int i = 1; i <= n_worms; ++ i){ 
                     double immature_period = random_real()*normal(immature_period_mean,immature_period_mean_std);
@@ -193,7 +193,6 @@ void region::seed_lf(){
    
     sort(bite_scales.begin(),bite_scales.end(), greater<double>());
    
-    int prop_shuffle =8;
     int top_shuffle = rpop/prop_shuffle;
     int n_infected = ant_pos + pre_indiv.size();
 
@@ -235,154 +234,6 @@ void region::seed_lf(){
         bite_scales.pop_back();
     }
     
-}
-
-void region::seed_lf_single(){
-    reset_prev();
-    double ant_pos = 0;
-    //iterating over groups
-    vector<double> bite_scales {};
-     
-    for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){
-        
-        group *grp = j->second;
-       
-        vector<double> cum_sum_prob = prob_worms(ant_0); //found the prob of different worm burdens in village assuming negative bionmial
-        //iterating over group members!                        uninf_indiv.insert(pair<int, agent*>(cur->aid, cur));
-
-        for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
-            agent *cur = k->second;
-            bite_scales.push_back(cur->bite_scale);
-
-            cur->ngp = grp; //assigning night group
-
-            double inf_status = random_real(); //used to determine number of worms
-            int worm_count = number_worms(cum_sum_prob, inf_status); //the number of worms
-            
-            int wm = 0; //male worms
-            int wf = 0; //female worms
-            
-            if (worm_count > 0){ // person has adult worms
-                
-                ++ant_pos;
-                double mature_period;
-            
-
-                for(int i = 1; i <= worm_count; ++ i){                  
-                    mature_period = (1-init_beta(1,1.4))*normal(mature_period_mean,mature_period_mean_std);
-                    if(random_real() < proportion_male_agent){ //has one male mature
-                        cur->wvec.push_back(new worm('M', 0, mature_period ,'M'));
-                        ++wm;
-                    }
-                    else{ //has one female mature
-                        cur->wvec.push_back(new worm('M', 0, mature_period ,'F'));
-                        ++wf;
-                    }
-                }
-                
-                if ((wf > 0) && (wm >0)){ //agent has breeding pair of worms!
-                    cur->status='I';
-                    cur->worm_strength = wf;
-                    inf_indiv.insert(pair<int, agent*>(cur->aid, cur)); //storing the person as infected!
-                } 
-                else{
-                    cur->status='U';
-                    uninf_indiv.insert(pair<int, agent*>(cur->aid, cur));
-                }
-
-                if(random_real() <= immature_and_ant){ //assigning immature worms to ant positive 
-                    int n_worms;
-                    n_worms = max(poisson(1),1);
-                
-                    for(int i = 1; i <= n_worms; ++ i){ 
-                        double immature_period = random_real()*normal(immature_period_mean,immature_period_mean_std);
-                        double mature_period = normal(mature_period_mean,mature_period_mean_std);
-
-                        if(random_real() < proportion_male_worm){
-                            cur->wvec.push_back(new worm('P', random_real()*immature_period, mature_period ,'M'));
-                        }
-                        else{
-                            cur->wvec.push_back(new worm('P', random_real()*immature_period, mature_period ,'F'));
-                        }
-                    }
-                }
-
-            }
-            else if (random_real() <= ant_0*immature_to_antigen){
-                cur->status='E';
-                pre_indiv.insert(pair<int, agent*>(cur->aid, cur));
-
-                int n_worms;
-                n_worms = max(poisson(1),1);
-                
-                for(int i = 1; i <= n_worms; ++ i){ 
-                    double immature_period = random_real()*normal(immature_period_mean,immature_period_mean_std);
-                    double mature_period = normal(mature_period_mean,mature_period_mean_std);
-
-                    if(random_real() < proportion_male_worm){
-                        cur->wvec.push_back(new worm('P', random_real()*immature_period, mature_period ,'M'));
-                    }
-                    else{
-                        cur->wvec.push_back(new worm('P', random_real()*immature_period, mature_period ,'F'));
-                    }
-                }
-            
-            } else{
-                no_worms_indiv.insert(pair<int, agent*>(cur->aid, cur));
-            }
-            
-        }
-    }
-
-    init_ratio = (double)inf_indiv.size() / (double)ant_pos;
-    init_prev = 100 * (double)ant_pos / (double)rpop;
-    //now reassining bite_scales
-   
-    sort(bite_scales.begin(),bite_scales.end(), greater<double>());
-   
-    int prop_shuffle =8;
-    int top_shuffle = rpop/prop_shuffle;
-    int n_infected = ant_pos + pre_indiv.size();
-
-    //shuffling!
-    partial_shuffle(bite_scales, 0,top_shuffle); //shuffle the top quater to randomise the most bitten scales
-    partial_shuffle(bite_scales,bite_scales.size()-(rpop-n_infected), bite_scales.size());
-    
-    //now reassigning to agents! first the people with no worms 
-    for(map<int, agent*>::iterator j = no_worms_indiv.begin(); j != no_worms_indiv.end(); ++j){
-        agent *cur = j->second;
-        
-        cur->bite_scale =  bite_scales.back();
-
-        bite_scales.pop_back();
-    }
-
-    //Now for worm postive people!
-    for(map<int, agent*>::iterator j = pre_indiv.begin(); j != pre_indiv.end(); ++j){
-        agent *cur = j->second;
-        
-        cur->bite_scale =  bite_scales.back();
-
-        bite_scales.pop_back();
-    }
-
-    for(map<int, agent*>::iterator j = uninf_indiv.begin(); j != uninf_indiv.end(); ++j){
-        agent *cur = j->second;
-        
-        cur->bite_scale =  bite_scales.back();
-
-        bite_scales.pop_back();
-    }
-
-    for(map<int, agent*>::iterator j = inf_indiv.begin(); j != inf_indiv.end(); ++j){
-        agent *cur = j->second;
-        
-        cur->bite_scale =  bite_scales.back();
-
-        bite_scales.pop_back();
-    }
-    
-
 }
 
 vector<double> region::prob_worms(double prev){

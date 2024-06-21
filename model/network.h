@@ -127,7 +127,6 @@ public:
     void calc_risk_single();
     void update_epi_status(int year, int day, int dt);                  //update agent's epi status
     void seed_lf();                                             //seed LF in population
-    void seed_lf_single();
 
     double mf_functional_form(char form, double worm_strength);            //converts worm strength to mf load
 

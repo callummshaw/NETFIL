@@ -13,7 +13,7 @@ int SimulationNumber = 0;
 string prv_out_loc;
 
 int main(int argc, const char * argv[]){
-    
+
     prv_out_loc = argv[1];
    
     region *rgn = new region(region_id, region_name);
