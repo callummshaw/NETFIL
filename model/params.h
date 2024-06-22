@@ -25,7 +25,7 @@ using namespace std;
 
 #define n_age_groups                16 //number of age brackets (for seeding pop)
 
-#define sim_years                   7//defining prob functions that are used
+#define sim_years                   16//defining prob functions that are used
 
 #define max_init_age                80 //maximum age of agent upon init
 
@@ -44,12 +44,7 @@ using namespace std;
 #define commuting_prop              0.5 //proportion of group that commut daily (over 5 years old)
 #define DailyProbLoseAntigen        0.992327946   //set so the half-life is 90 days i.e. pow(0.5,1/90)
 
-#define init_year_dist_a              1 //used for the initial age of worms when seeding, beta dist
-#define init_year_dist_b              1.4 //used for the initial age of worms when seeding, beta dist
-#define init_immature_worms           1 // used for the initial immature worm dist in postive people, poisson 
-#define prop_shuffle                  8// what proportion of top bite_scale do we want infected to be seeeded from
-
-#define ABC_fitting                 true
+#define ABC_fitting                 false
 #define ABC_fitting_init            false
 
 #define run_off_fitted              false
@@ -96,4 +91,5 @@ void partial_shuffle(vector<double>& vec, int start, int end);
 #define car_distance                "road_dist.csv"
 
 #define MDA_params                  "MDAParams.csv"
+#define Init_params                 "InitParams.csv"
 #endif /* headers_h */

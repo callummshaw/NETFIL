@@ -76,6 +76,11 @@ public:
     double agg_scale;
     double agg_param_init;
 
+    double init_beta_b;
+    double init_poisson;
+    int init_inf_shuffle;
+    int init_other_shuffle;
+
     double age_dist[n_age_groups];     //container for the age distribution
     int age_dist_lower[n_age_groups];
     int age_dist_upper[n_age_groups];
@@ -124,7 +129,6 @@ public:
     void renew_pop(int year, int day, int dt);
     void hndl_birth(int year, int day, int dt);                         // handle new births
     void calc_risk();         //find prevalence in each village
-    void calc_risk_single();
     void update_epi_status(int year, int day, int dt);                  //update agent's epi status
     void seed_lf();                                             //seed LF in population
 

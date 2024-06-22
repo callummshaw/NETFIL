@@ -27,38 +27,23 @@ agent::~agent(){
 
 }
 
-void agent::sim_bites(double c, double worktonot){
+void agent::sim_bites(double c, double worktonot, bool single){
     
-    int day_bites;
-    int night_bites;
     int total_bites;
 
-    day_bites  = poisson(c *  dgp->day_strength * bite_scale * worktonot);
-    night_bites = poisson(c * ngp->night_strength * bite_scale * (1.0 - worktonot));
-
-    total_bites = day_bites + night_bites;
+    if(single){
+        total_bites = poisson(c *  ngp->night_strength * bite_scale);
+    }else{
+        int day_bites;
+        int night_bites;
     
-    for(int i = 0; i < total_bites; ++i){ //looping through infective bites and assigning worms
-        int immature_period = normal(immature_period_mean, immature_period_mean_std); //immature period of worm
-        int mature_period = normal(mature_period_mean, mature_period_mean_std); //mature period of worm
 
-        if (random_real() < proportion_male_worm){ // worm is male!
-            wvec.push_back(new worm('P', immature_period, mature_period, 'M'));
-        }
-        else{ // worm is female!
-            wvec.push_back(new worm('P', immature_period, mature_period, 'F'));
-        }
+        day_bites  = poisson(c *  dgp->day_strength * bite_scale * worktonot);
+        night_bites = poisson(c * ngp->night_strength * bite_scale * (1.0 - worktonot));
+
+        total_bites = day_bites + night_bites;
     }
-
-    if(total_bites > 0 && status == 'S') status = 'E';
-}
-
-void agent::sim_bites_single(double c){
-
-    int total_bites;
-   
-    total_bites = poisson(c * ngp->night_strength * bite_scale);
-
+    
     for(int i = 0; i < total_bites; ++i){ //looping through infective bites and assigning worms
         int immature_period = normal(immature_period_mean, immature_period_mean_std); //immature period of worm
         int mature_period = normal(mature_period_mean, mature_period_mean_std); //mature period of worm

@@ -438,10 +438,7 @@ void region::read_parameters(){
         p = strtok(str, " ");      double theta_1 = atof(p);
         p = strtok(NULL, " ");     double theta_2 = atof(p);
         p = strtok(NULL, " ");     double k = atof(p);
-        p = strtok(NULL, " ");     double imtoant = atof(p);
-        p = strtok(NULL, " ");     double inandun = atof(p);
         p = strtok(NULL, " ");     double w2n = atof(p);
-        p = strtok(NULL, " ");     double ki = atof(p);
 
         delete []str;
         in.close();
@@ -451,17 +448,14 @@ void region::read_parameters(){
         theta3 = 1 / (1 - exp(-theta2));
         agg_param = k;
         agg_scale = 1 / k;
-        immature_to_antigen = imtoant;
-        immature_and_ant = inandun;
         worktonot  = w2n;
-        agg_param_init = ki;
-
+    
     }
     else{
         if (!run_off_fitted){ //running from point estimates from Trans-Params
             file = datadir; file = file + Tran_param;
             in.open(file.c_str());
-            getline(in, line);
+            getline(in,line);
             getline(in,line);
             char *str = new char[line.size()+1];
             strcpy(str, line.c_str());
@@ -470,10 +464,7 @@ void region::read_parameters(){
             p = strtok(str, ",");      double theta_1 = atof(p);
             p = strtok(NULL, ",");     double theta_2 = atof(p);
             p = strtok(NULL, ",");     double k = atof(p);
-            p = strtok(NULL, ",");     double imtoant = atof(p);
-            p = strtok(NULL, ",");     double inandun = atof(p);
             p = strtok(NULL, ",");     double w2n = atof(p);
-            p = strtok(NULL, ",");     double ki = atof(p);
 
             delete []str;
             in.close();
@@ -483,10 +474,8 @@ void region::read_parameters(){
             theta3 = 1 / (1 - exp(-theta2));
             agg_param = k;
             agg_scale = 1 / k;
-            immature_to_antigen = imtoant;
-            immature_and_ant = inandun;
             worktonot  = w2n;
-            agg_param_init = ki;
+       
         }
         else if (run_off_fitted){
                         
@@ -503,20 +492,13 @@ void region::read_parameters(){
             p = strtok(str, ",");      double theta_1 = atof(p);
             p = strtok(NULL, ",");     double theta_2 = atof(p);
             p = strtok(NULL, ",");     double k = atof(p);
-            p = strtok(NULL, ",");     double imtoant = atof(p);
-            p = strtok(NULL, ",");     double inandun = atof(p);
             p = strtok(NULL, ",");     double w2n = atof(p);
-            p = strtok(NULL, ",");     double ki = atof(p);
 
             delete []str;
             in.close();
             
-            immature_to_antigen = imtoant;
-            immature_and_ant = inandun;
-            agg_param_init = ki;
             theta2 = theta_2;
             theta3 = 1 / (1 - exp(-theta2));
-
             //Theta1
             string loc = "Fitted/Theta1.txt";
             vector<double> values;
@@ -576,6 +558,33 @@ void region::read_parameters(){
 
         }
     }
+
+    //read in init params
+    file = datadir; file = file + Init_params;
+    in.open(file.c_str());
+    getline(in,line);
+    getline(in,line);
+    char *str = new char[line.size()+1];
+    strcpy(str, line.c_str());
+    char *p = NULL;
+
+    p = strtok(str, ",");      double init_k = atof(p);
+    p = strtok(NULL, ",");     double init_ls = atof(p);
+    p = strtok(NULL, ",");     double init_mi = atof(p);
+    p = strtok(NULL, ",");     int init_ti = atoi(p);
+    p = strtok(NULL, ",");     int init_to = atoi(p);
+    p = strtok(NULL, ",");     double init_itoa = atof(p);
+    p = strtok(NULL, ",");     double init_ianda = atof(p);
+    delete []str;
+    in.close();
+    
+    agg_param_init = init_k;
+    init_beta_b = init_ls;
+    init_poisson = init_mi;
+    init_inf_shuffle = init_ti;
+    init_other_shuffle = init_to;
+    immature_to_antigen = init_itoa;
+    immature_and_ant = init_ianda;
 }
 
 void region::reset_population(){
