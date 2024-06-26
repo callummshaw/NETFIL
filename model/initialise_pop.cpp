@@ -425,7 +425,7 @@ void region::read_parameters(){
         in.close();
     }
     
-    if (ABC_fitting || ABC_fitting_init){
+    if (ABC_fitting){
 
         file = Tran_param;
         in.open(file.c_str());
@@ -568,21 +568,15 @@ void region::read_parameters(){
     strcpy(str, line.c_str());
     char *p = NULL;
 
-    p = strtok(str, ",");      double init_k = atof(p);
-    p = strtok(NULL, ",");     double init_ls = atof(p);
+    p = strtok(str, ",");     double init_ls = atof(p);
     p = strtok(NULL, ",");     double init_mi = atof(p);
-    p = strtok(NULL, ",");     int init_ti = atoi(p);
-    p = strtok(NULL, ",");     int init_to = atoi(p);
     p = strtok(NULL, ",");     double init_itoa = atof(p);
     p = strtok(NULL, ",");     double init_ianda = atof(p);
     delete []str;
     in.close();
     
-    agg_param_init = init_k;
     init_beta_b = init_ls;
     init_poisson = init_mi;
-    init_inf_shuffle = init_ti;
-    init_other_shuffle = init_to;
     immature_to_antigen = init_itoa;
     immature_and_ant = init_ianda;
 }

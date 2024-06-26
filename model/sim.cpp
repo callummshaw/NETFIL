@@ -8,9 +8,7 @@ void region::sim(int year, mda_strat strat){
     
     bool debug_fit = false; //prints out yearly data
 
-    if (ABC_fitting && ABC_fitting_init){
-        cout << "Warning both stages of fitting turned on" << endl;
-    }
+
     //if the first year, must seed LF in the population
     if(year == 0){
         init_prev = 0;
@@ -18,22 +16,17 @@ void region::sim(int year, mda_strat strat){
         while(((init_prev < init_prev_min) || (init_prev > init_prev_max)) || ((init_ratio < init_ratio_min) || (init_ratio > init_ratio_max))){
             
             seed_lf();
-            if( ABC_fitting_init) break;
-           
         }
-        if (!ABC_fitting_init){
-            cout << "Init prev: " << init_prev << "%" << endl;
-            cout << "MF to Ant: " << init_ratio << endl;
-        }
+        
+        cout << "Init prev: " << init_prev << "%" << endl;
+        cout << "MF to Ant: " << init_ratio << endl;
+        
     }
 
     if (prv_out_loc == "print"){
         debug_fit = true;
     }
     
-    if(ABC_fitting_init){
-        if (year == 0) output_abc_epidemics_init();
-    }
     else{
         handl_commute(year);
         achieved_coverage[year] = 0;
@@ -81,32 +74,79 @@ void region::sim(int year, mda_strat strat){
 void region::seed_lf(){
     reset_prev();
     double ant_pos = 0;
-    double group_prev;
-    vector<double> bite_scales {};
+
+    string filename = datadir;
+    filename  = filename + "initaggs.csv";
+    ifstream file(filename);
+    string line;
+    vector<double> Init_prev, Init_k;
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string valueA, valueB;
+        getline(ss, valueA, ',');
+        getline(ss, valueB, ',');
+        Init_prev.push_back(stod(valueA));
+        Init_k.push_back(stod(valueB));
+    }
+
+    file.close();
 
     //iterating over groups
     for(map<int, group*>::iterator j = groups.begin(); j != groups.end(); ++j){
         
+        double minDifference = 1;
+        int closestIndex = -1;
+
+        double ki; //init agg to get correct ant to mf prevalence
+        double in_agg; //inverse init agg used in calcs oftern
+        double Mean_load; //mean worm burden in group
+        double group_prev; //antigen prev in our group
+        
         group *grp = j->second;
 
-        if (groups.size() > 1){
+        if (groups.size() > 1){ //for multiple groups we need to determine antigen prev which is clustered at the group level
             double group_effect = normal(0.0,sigma_g);
             double group_log_odds = group_effect + beta_0;
             group_prev = 1/(1+exp(-group_log_odds));
-        } else{
-            group_prev = ant_0;
-        } 
-     
-        vector<double> cum_sum_prob = prob_worms(group_prev); //found the prob of different worm burdens in village assuming negative bionmial
-        //iterating over group members!                        uninf_indiv.insert(pair<int, agent*>(cur->aid, cur));
+        
+            if (group_prev > 0.48){ //ensuring there is a maximum group prev (rarely hits this but is important to include)
+                group_prev = 0.48;
+            };
+        }else{
+            group_prev = ant_0; //for single groups we already know the prev!
+        }
+
+        for (int i = 0; i < Init_prev.size(); ++i) { //now given the prev we are finding the init aggregation from values we have calculated previously (finding the roots here was too intensive so I found them previously in mathematica and included them here)
+            double difference = abs(Init_prev[i] - group_prev);
+            if (difference < minDifference) {
+                minDifference = difference;
+                closestIndex = i;
+            }
+        }
+
+        ki = Init_k[closestIndex];
+        in_agg = 1.0 / ki;
+        Mean_load = ki*(1-pow((1-group_prev),in_agg))/pow((1-group_prev),in_agg);
 
         for(map<int, agent*>::iterator k = grp->group_pop.begin(); k != grp->group_pop.end(); ++k){
             agent *cur = k->second;
             cur->ngp = grp; //assigning night group
-            bite_scales.push_back(cur->bite_scale);
+            double agent_running_agg;
+            double agent_init_agg; //draw an agents initial bite_scale
+            
+            if (agg_param < ki){ //region has been seeded with a high init prevalence then we base init on running
+                agent_running_agg = bite_gamma(agg_param,1);
+                agent_init_agg = agent_running_agg + bite_gamma((ki - agg_param),1);
+                agent_running_agg *= agg_scale;
+            }else{ //we base running on init!
+                agent_init_agg = bite_gamma(ki,1);
+                agent_running_agg =  agg_scale*(agent_init_agg + bite_gamma((agg_param-ki),1)); //drawing the agents running scale which is determined by input
+            }
+        
+            cur->bite_scale = agent_running_agg; 
 
-            double inf_status = random_real(); //used to determine number of worms
-            int worm_count = number_worms(cum_sum_prob, inf_status); //the number of worms
+            int worm_count = poisson(in_agg*agent_init_agg*Mean_load); //the number of worms
             
             int wm = 0; //male worms
             int wf = 0; //female worms
@@ -185,103 +225,10 @@ void region::seed_lf(){
     
     init_ratio = (double)inf_indiv.size() / (double)ant_pos;
     init_prev = 100 * (double)ant_pos / (double)rpop;
-    //now reassining bite_scales
-    if((init_inf_shuffle > 0) || (init_other_shuffle > 0)){
-
-        sort(bite_scales.begin(),bite_scales.end(), greater<double>());
-
-        if(init_inf_shuffle <  inf_indiv.size()){
-            init_inf_shuffle = inf_indiv.size(); 
-            cout << "Warning trying to shuffle less values than there are infectious persons" << endl;
-            cout << "Setting to shuffle to least possible" <<endl;
-        }
-        
-        //doing the inf first
-        partial_shuffle(bite_scales,0,init_inf_shuffle);
-
-        for(map<int, agent*>::iterator j = inf_indiv.begin(); j != inf_indiv.end(); ++j){
-            agent *cur = j->second;
-            
-            cur->bite_scale =  bite_scales.front();
-            bite_scales.erase(bite_scales.begin());        
-        }
-
-        int n_infected = uninf_indiv.size() + pre_indiv.size();
-
-        if(init_other_shuffle <  n_infected){
-            init_inf_shuffle = n_infected; 
-            cout << "Warning trying to shuffle less values than there are other infected persons" << endl;
-            cout << "Setting to shuffle to least possible" <<endl;
-        }
-
-        //shuffling!
-        partial_shuffle(bite_scales, 0,init_other_shuffle); //shuffle the top quater to randomise the most bitten scales
-        partial_shuffle(bite_scales,bite_scales.size()-(rpop-n_infected), bite_scales.size());
-        
-        //now reassigning to agents! first the people with no worms 
-        for(map<int, agent*>::iterator j = no_worms_indiv.begin(); j != no_worms_indiv.end(); ++j){
-            agent *cur = j->second;
-            
-            cur->bite_scale =  bite_scales.back();
-
-            bite_scales.pop_back();
-        }
-
-        //Now for worm postive people!
-        for(map<int, agent*>::iterator j = pre_indiv.begin(); j != pre_indiv.end(); ++j){
-            agent *cur = j->second;
-            
-            cur->bite_scale =  bite_scales.back();
-
-            bite_scales.pop_back();
-        }
-
-        for(map<int, agent*>::iterator j = uninf_indiv.begin(); j != uninf_indiv.end(); ++j){
-            agent *cur = j->second;
-            
-            cur->bite_scale =  bite_scales.back();
-
-            bite_scales.pop_back();
-        }
-
-    }
-}
-
-vector<double> region::prob_worms(double prev){
     
-    int n_worms  = 10; //number of worms we want to consider for init
-   
-    double alpha = 1 / agg_param_init;
-    double worm_mean = agg_param_init*(1 - pow(( 1 - prev),alpha))/pow(( 1 - prev),alpha); //mean worm burden in group (assuming negative binomial)
-   
-    double worm_prob = 0.0;
-    
-    vector<double> cum_sum_prob;
-
-    for (int i = 0; i <= n_worms; ++i){ //now working out prob of each worm burden assuming negative binomial
-        worm_prob += (tgamma(i + agg_param_init) / (tgamma(agg_param_init) * factorial(i))) * pow((worm_mean / (agg_param_init + worm_mean)),i) * pow((agg_param_init / (agg_param_init + worm_mean)),agg_param_init);
-
-        cum_sum_prob.push_back(worm_prob); // storing
-    
-    } 
-    //Now calculating relative prob of each non-zero worm burden
-    return cum_sum_prob;
-
 }
 
 int region::factorial(int n) {
     if (n == 0) return 1;
     return n * factorial(n - 1);
-}
-
-int region::number_worms(vector<double> cum_sum_prob, double prob){
-    int n_worms = cum_sum_prob.size();
-
-    for ( int i = 0; i <= n_worms; ++i){
-        if (prob <= cum_sum_prob[i]) return i;
-    }
-    
-    //cout << "Over 10" << endl;
-
-    return n_worms;
 }

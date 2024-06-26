@@ -74,12 +74,9 @@ public:
     
     double agg_param;
     double agg_scale;
-    double agg_param_init;
 
     double init_beta_b;
     double init_poisson;
-    int init_inf_shuffle;
-    int init_other_shuffle;
 
     double age_dist[n_age_groups];     //container for the age distribution
     int age_dist_lower[n_age_groups];
@@ -131,7 +128,6 @@ public:
     void calc_risk();         //find prevalence in each village
     void update_epi_status(int year, int day, int dt);                  //update agent's epi status
     void seed_lf();                                             //seed LF in population
-
     double mf_functional_form(char form, double worm_strength);            //converts worm strength to mf load
 
     void implement_MDA(int year, mda_strat strat);           //MDA!
@@ -147,9 +143,7 @@ public:
     void output_epidemics(int year, int day, mda_strat strategy);    //output outbreak data
     void output_abc_epidemics(int year);
     void output_abc_epidemics_single(int year);
-    void output_abc_epidemics_init();
     int factorial(int n);
-    vector<double> prob_worms(double prev);
-    int number_worms(vector<double> cum_sum_prob, double prob);
+
 };
 #endif /* network_hpp */
