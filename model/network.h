@@ -87,7 +87,7 @@ public:
     map<int, agent*> uninf_indiv;      //collection of peple with adult worms but are uninfectious individuals (single gender or sterile)
     map<int, agent*> no_worms_indiv;   //collection of people with no worms!
     vector<agent*> pvec[n_age_groups]; //storing all people of certain age group
-
+    vector<double> cum_sum_prob_worm {};
     //now all the information about the groups
     int next_gid, group_blocks;
     map<int, group*> groups;            //storing all groups in region
@@ -144,6 +144,7 @@ public:
     void output_abc_epidemics(int year);
     void output_abc_epidemics_single(int year);
     int factorial(int n);
-
+    int n_worms();
+    void prob_worms(double agg_param_init, double worm_mean);
 };
 #endif /* network_hpp */

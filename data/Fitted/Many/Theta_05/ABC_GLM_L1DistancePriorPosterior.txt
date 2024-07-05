@@ -1,0 +1,1 @@
+	T1	density	W	density	k	densityObs0	0.595339	0.928069	0.574429

@@ -36,7 +36,7 @@ void agent::sim_bites(double c, double worktonot, bool single){
     }else{
         int day_bites;
         int night_bites;
-    
+        
 
         day_bites  = poisson(c *  dgp->day_strength * bite_scale * worktonot);
         night_bites = poisson(c * ngp->night_strength * bite_scale * (1.0 - worktonot));
