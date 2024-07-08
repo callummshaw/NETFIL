@@ -19,7 +19,8 @@ agent::agent(int aid,  double bite_shape, int age){
 }
 
 agent::~agent(){
-
+    dgp = NULL;
+    ngp = NULL;
     for(int i = 0; i < wvec.size(); ++i){
         delete wvec[i];
     }

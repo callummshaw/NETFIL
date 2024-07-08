@@ -332,6 +332,7 @@ void region::read_parameters(){
     //reading road_dst & euclid_dst for multigroup sims!
     if (group_blocks > 1){
         int len = group_blocks*(group_blocks-1)/2;
+        cout << "BUILDING ROADS" <<endl;
         road_dst = new double[len];     memset(road_dst, 0, sizeof(double)*len);
         euclid_dst = new double[len];   memset(euclid_dst, 0, sizeof(double)*len);
         
@@ -587,7 +588,7 @@ void region::reset_population(){
     pre_indiv.clear();
     inf_indiv.clear();
     uninf_indiv.clear();
-
+    no_worms_indiv.clear();
     for(map<int, group*>::iterator j = groups.begin();  j != groups.end(); ++j){ //iterating through groups
         delete j->second;
     }
@@ -598,10 +599,18 @@ void region::reset_population(){
     }
     group_coords.clear();
 
+    for(int i = 0; i < n_age_groups; ++i){
+        pvec[i].clear();
+    }
     group_names.clear();
     group_numbers.clear();
 
     group_pops.clear();
+    
+    delete[] road_dst;
+    delete[] euclid_dst;
+    euclid_dst = nullptr;
+    road_dst = nullptr;
 
     rpop = 0;
     next_aid = 1;
@@ -612,7 +621,9 @@ void region::reset_population(){
         cout << "reload pop err" << endl;
         exit(1);
     }
+    
     read_parameters();
+    
 
 }
 
@@ -668,6 +679,18 @@ group::~group(){
     for(map<int, agent*>::iterator j = group_pop.begin(); j != group_pop.end(); ++j)
         delete j->second;
     group_pop.clear();
+    for (auto node : commuting_dist) {
+        delete node;
+    }
+
+    // Clear the vector to remove all pointer elements (now dangling pointers)
+    commuting_dist.clear();
+    commuting_dist.clear();
+    day_population.clear();
+    commuting_pop.clear();
+    day_population.clear();
+    commuting_cumsum.clear();
+
 }
 
 //build individual group populations!
